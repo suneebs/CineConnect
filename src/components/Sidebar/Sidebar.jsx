@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Link, Tooltip } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { InstagramLogo, InstagramMobileLogo } from "../../assets/constants";
+import { CineConnectLogo, CineConnectMobileLogo } from "../../assets/constants";
 
 import { BiLogOut } from "react-icons/bi";
 import useLogout from "../../hooks/useLogout";
@@ -21,12 +21,12 @@ const Sidebar = () => {
 		>
 			<Flex direction={"column"} gap={10} w='full' height={"full"}>
 				<Link to={"/"} as={RouterLink} pl={2} display={{ base: "none", md: "block" }} cursor='pointer'>
-					<InstagramLogo />
+					<CineConnectLogo />
 				</Link>
 				<Link
 					to={"/"}
 					as={RouterLink}
-					p={2}
+					p={0}
 					display={{ base: "block", md: "none" }}
 					borderRadius={6}
 					_hover={{
@@ -35,7 +35,7 @@ const Sidebar = () => {
 					w={10}
 					cursor='pointer'
 				>
-					<InstagramMobileLogo />
+					<CineConnectMobileLogo />
 				</Link>
 				<Flex direction={"column"} gap={5} cursor={"pointer"}>
 					<SidebarItems />

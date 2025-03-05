@@ -1,5 +1,6 @@
 import { Box, Flex, Tooltip } from "@chakra-ui/react";
-import { NotificationsLogo } from "../../assets/constants";
+import { IoMdNotificationsOutline } from "react-icons/io";
+
 
 const Notifications = () => {
 	return (
@@ -20,7 +21,7 @@ const Notifications = () => {
 				w={{ base: 10, md: "full" }}
 				justifyContent={{ base: "center", md: "flex-start" }}
 			>
-				<NotificationsLogo />
+				<IoMdNotificationsOutline size={25}/>
 				<Box display={{ base: "none", md: "block" }}>Notifications</Box>
 			</Flex>
 		</Tooltip>
