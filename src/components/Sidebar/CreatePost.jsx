@@ -17,9 +17,9 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import { CreatePostLogo } from "../../assets/constants";
-import { BsFillImageFill } from "react-icons/bs";
+import { MdPermMedia } from "react-icons/md";
 import { useRef, useState } from "react";
-import usePreviewImg from "../../hooks/usePreviewImg";
+import usePreviewMedia from "../../hooks/usePreviewImg";
 import useShowToast from "../../hooks/useShowToast";
 import useAuthStore from "../../store/authStore";
 import usePostStore from "../../store/postStore";
@@ -32,14 +32,14 @@ import { getDownloadURL, ref, uploadString } from "firebase/storage";
 const CreatePost = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [caption, setCaption] = useState("");
-	const imageRef = useRef(null);
-	const { handleImageChange, selectedFile, setSelectedFile } = usePreviewImg();
+	const fileRef = useRef(null);
+	const { handleMediaChange, selectedFile, fileType, setSelectedFile } = usePreviewMedia();
 	const showToast = useShowToast();
 	const { isLoading, handleCreatePost } = useCreatePost();
 
 	const handlePostCreation = async () => {
 		try {
-			await handleCreatePost(selectedFile, caption);
+			await handleCreatePost(selectedFile, fileType, caption);
 			onClose();
 			setCaption("");
 			setSelectedFile(null);
@@ -86,16 +86,23 @@ const CreatePost = () => {
 							onChange={(e) => setCaption(e.target.value)}
 						/>
 
-						<Input type='file' hidden ref={imageRef} onChange={handleImageChange} />
+						<Input type='file' hidden ref={fileRef} onChange={handleMediaChange} accept="image/*,video/*" />
 
-						<BsFillImageFill
-							onClick={() => imageRef.current.click()}
-							style={{ marginTop: "15px", marginLeft: "5px", cursor: "pointer" }}
-							size={16}
-						/>
+						<Flex mt={3} gap={4}>
+    <MdPermMedia
+        onClick={() => fileRef.current.click()}
+        style={{ cursor: "pointer" }}
+        size={24}
+    />
+</Flex>
+
 						{selectedFile && (
 							<Flex mt={5} w={"full"} position={"relative"} justifyContent={"center"}>
-								<Image src={selectedFile} alt='Selected img' />
+								{fileType === "image" ? (
+									<Image src={selectedFile} alt='Selected media' />
+								) : (
+									<video src={selectedFile} controls style={{ maxWidth: "100%" }} />
+								)}
 								<CloseButton
 									position={"absolute"}
 									top={2}
@@ -130,9 +137,9 @@ function useCreatePost() {
 	const userProfile = useUserProfileStore((state) => state.userProfile);
 	const { pathname } = useLocation();
 
-	const handleCreatePost = async (selectedFile, caption) => {
+	const handleCreatePost = async (selectedFile, fileType, caption) => {
 		if (isLoading) return;
-		if (!selectedFile) throw new Error("Please select an image");
+		if (!selectedFile) throw new Error("Please select an image or video");
 		setIsLoading(true);
 		const newPost = {
 			caption: caption,
@@ -140,20 +147,21 @@ function useCreatePost() {
 			comments: [],
 			createdAt: Date.now(),
 			createdBy: authUser.uid,
+			type: fileType, // Store type (image/video)
 		};
 
 		try {
 			const postDocRef = await addDoc(collection(firestore, "posts"), newPost);
 			const userDocRef = doc(firestore, "users", authUser.uid);
-			const imageRef = ref(storage, `posts/${postDocRef.id}`);
+			const fileRef = ref(storage, `posts/${postDocRef.id}`);
 
 			await updateDoc(userDocRef, { posts: arrayUnion(postDocRef.id) });
-			await uploadString(imageRef, selectedFile, "data_url");
-			const downloadURL = await getDownloadURL(imageRef);
+			await uploadString(fileRef, selectedFile, "data_url");
+			const downloadURL = await getDownloadURL(fileRef);
 
-			await updateDoc(postDocRef, { imageURL: downloadURL });
+			await updateDoc(postDocRef, { fileURL: downloadURL });
 
-			newPost.imageURL = downloadURL;
+			newPost.fileURL = downloadURL;
 
 			if (userProfile.uid === authUser.uid) createPost({ ...newPost, id: postDocRef.id });
 
@@ -168,64 +176,4 @@ function useCreatePost() {
 	};
 
 	return { isLoading, handleCreatePost };
-}
-
-// 1- COPY AND PASTE AS THE STARTER CODE FOR THE CRAETEPOST COMPONENT
-// import { Box, Flex, Tooltip } from "@chakra-ui/react";
-// import { CreatePostLogo } from "../../assets/constants";
-
-// const CreatePost = () => {
-// 	return (
-// 		<>
-// 			<Tooltip
-// 				hasArrow
-// 				label={"Create"}
-// 				placement='right'
-// 				ml={1}
-// 				openDelay={500}
-// 				display={{ base: "block", md: "none" }}
-// 			>
-// 				<Flex
-// 					alignItems={"center"}
-// 					gap={4}
-// 					_hover={{ bg: "whiteAlpha.400" }}
-// 					borderRadius={6}
-// 					p={2}
-// 					w={{ base: 10, md: "full" }}
-// 					justifyContent={{ base: "center", md: "flex-start" }}
-// 				>
-// 					<CreatePostLogo />
-// 					<Box display={{ base: "none", md: "block" }}>Create</Box>
-// 				</Flex>
-// 			</Tooltip>
-// 		</>
-// 	);
-// };
-
-// export default CreatePost;
-
-// 2-COPY AND PASTE FOR THE MODAL
-{
-	/* <Modal isOpen={isOpen} onClose={onClose} size='xl'>
-				<ModalOverlay />
-
-				<ModalContent bg={"black"} border={"1px solid gray"}>
-					<ModalHeader>Create Post</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody pb={6}>
-						<Textarea placeholder='Post caption...' />
-
-						<Input type='file' hidden />
-
-						<BsFillImageFill
-							style={{ marginTop: "15px", marginLeft: "5px", cursor: "pointer" }}
-							size={16}
-						/>
-					</ModalBody>
-
-					<ModalFooter>
-						<Button mr={3}>Post</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal> */
 }
