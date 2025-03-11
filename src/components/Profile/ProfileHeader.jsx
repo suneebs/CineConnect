@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Button, Flex, Text, VStack, useDisclosure } from "@chakra-ui/react";
+import { Avatar, AvatarGroup, Box, Button, Flex, Text, VStack, useDisclosure } from "@chakra-ui/react";
 import useUserProfileStore from "../../store/userProfileStore";
 import useAuthStore from "../../store/authStore";
 import EditProfile from "./EditProfile";
@@ -9,6 +9,7 @@ const ProfileHeader = () => {
 	const authUser = useAuthStore((state) => state.user);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { isFollowing, isUpdating, handleFollowUser } = useFollowUser(userProfile?.uid);
+
 	const visitingOwnProfileAndAuth = authUser && authUser.username === userProfile.username;
 	const visitingAnotherProfileAndAuth = authUser && authUser.username !== userProfile.username;
 
@@ -30,9 +31,9 @@ const ProfileHeader = () => {
 					{visitingOwnProfileAndAuth && (
 						<Flex gap={4} alignItems={"center"} justifyContent={"center"}>
 							<Button
-								bg={"white"}
+								bg={"blue.500"}
 								color={"black"}
-								_hover={{ bg: "whiteAlpha.800" }}
+								_hover={{ bg: "blue.600" }}
 								size={{ base: "xs", md: "sm" }}
 								onClick={onOpen}
 							>
@@ -59,29 +60,49 @@ const ProfileHeader = () => {
 				<Flex alignItems={"center"} gap={{ base: 2, sm: 4 }}>
 					<Text fontSize={{ base: "xs", md: "sm" }}>
 						<Text as='span' fontWeight={"bold"} mr={1}>
-							{userProfile.posts.length}
+							{userProfile.posts?.length || 0}
 						</Text>
 						Posts
 					</Text>
 					<Text fontSize={{ base: "xs", md: "sm" }}>
 						<Text as='span' fontWeight={"bold"} mr={1}>
-							{userProfile.followers.length}
+							{userProfile.followers?.length || 0}
 						</Text>
 						Followers
 					</Text>
 					<Text fontSize={{ base: "xs", md: "sm" }}>
 						<Text as='span' fontWeight={"bold"} mr={1}>
-							{userProfile.following.length}
+							{userProfile.following?.length || 0}
 						</Text>
 						Following
 					</Text>
 				</Flex>
-				<Flex alignItems={"center"} gap={4}>
-					<Text fontSize={"sm"} fontWeight={"bold"}>
-						{userProfile.fullName}
-					</Text>
-				</Flex>
+
+				<Text fontSize={"sm"} fontWeight={"bold"}>
+					{userProfile.fullName}
+				</Text>
+
 				<Text fontSize={"sm"}>{userProfile.bio}</Text>
+
+				<Text fontSize={"sm"}>
+					<Text as='span' fontWeight={"bold"}>📍</Text>
+					{userProfile.location || "Not specified"}
+				</Text>
+				
+				<Flex gap={2} wrap="wrap">
+  {Array.isArray(userProfile?.profession) && userProfile.profession.filter(prof => prof.trim() !== "").length > 0 ? (
+    userProfile.profession
+      .filter(prof => prof.trim() !== "") // Remove empty strings
+      .map((prof, index) => (
+        <Box key={index} bg="gray.700" color="white" borderRadius="md" px={2} py={1}>
+          {prof}
+        </Box>
+      ))
+  ) : (
+    ""
+  )}
+</Flex>
+
 			</VStack>
 			{isOpen && <EditProfile isOpen={isOpen} onClose={onClose} />}
 		</Flex>

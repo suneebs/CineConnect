@@ -1,154 +1,139 @@
+import { useState } from "react";
 import {
 	Avatar,
 	Button,
-	Center,
 	Flex,
 	FormControl,
 	FormLabel,
-	Heading,
 	Input,
 	Modal,
 	ModalBody,
 	ModalCloseButton,
 	ModalContent,
+	ModalFooter,
 	ModalHeader,
 	ModalOverlay,
-	Stack,
+	Text,
+	Textarea,
 } from "@chakra-ui/react";
-import { useRef, useState, useEffect } from "react";
-import useAuthStore from "../../store/authStore";
-import usePreviewMedia from "../../hooks/usePreviewImg";
 import useEditProfile from "../../hooks/useEditProfile";
-import useShowToast from "../../hooks/useShowToast";
+import useUserProfileStore from "../../store/userProfileStore";
 
 const EditProfile = ({ isOpen, onClose }) => {
-	const authUser = useAuthStore((state) => state.user);
-	const fileRef = useRef(null);
-	const showToast = useShowToast();
-
-	const { handleMediaChange, selectedFile, setSelectedFile, file } = usePreviewMedia();
-	const { isUpdating, editProfile } = useEditProfile();
+	const { editProfile, isUpdating } = useEditProfile();
+	const { userProfile } = useUserProfileStore();
 
 	const [inputs, setInputs] = useState({
-		fullName: authUser?.fullName || "",
-		username: authUser?.username || "",
-		bio: authUser?.bio || "",
+		fullName: userProfile?.fullName || "",
+		username: userProfile?.username || "",
+		bio: userProfile?.bio || "",
+		location: userProfile?.location || "",
+		profession: Array.isArray(userProfile?.profession) ? userProfile.profession.join(", ") : userProfile?.profession || "",
 	});
 
-	useEffect(() => {
-		if (authUser) {
-			setInputs({
-				fullName: authUser.fullName || "",
-				username: authUser.username || "",
-				bio: authUser.bio || "",
-			});
-		}
-	}, [authUser]);
+	const [file, setFile] = useState(null);
+	const [preview, setPreview] = useState(userProfile?.profilePicURL || "");
 
-	const handleEditProfile = async () => {
-		if (!inputs.fullName.trim() || !inputs.username.trim()) {
-			showToast("Error", "Full Name and Username cannot be empty", "error");
-			return;
-		}
-
-		try {
-			await editProfile(inputs, file);
-			setSelectedFile(null);
-			onClose();
-		} catch (error) {
-			showToast("Error", error.message, "error");
+	const handleFileChange = (e) => {
+		const selectedFile = e.target.files[0];
+		if (selectedFile) {
+			setFile(selectedFile);
+			setPreview(URL.createObjectURL(selectedFile));
 		}
 	};
 
+	const handleSubmit = async () => {
+		const updatedInputs = {
+			...inputs,
+			profession: inputs.profession.split(",").map((item) => item.trim()), // Convert comma-separated string to array
+		};
+
+		await editProfile(updatedInputs, file);
+		onClose();
+	};
+
 	return (
-		<Modal isOpen={isOpen} onClose={onClose}>
+		<Modal isOpen={isOpen} onClose={onClose} isCentered size="md">
 			<ModalOverlay />
-			<ModalContent bg={"black"} boxShadow={"xl"} border={"1px solid gray"} mx={3}>
-				<ModalHeader />
+			<ModalContent>
+				<ModalHeader>Edit Profile</ModalHeader>
 				<ModalCloseButton />
+
 				<ModalBody>
-					<Flex bg={"black"}>
-						<Stack spacing={4} w={"full"} maxW={"md"} bg={"black"} p={6} my={0}>
-							<Heading lineHeight={1.1} fontSize={{ base: "2xl", sm: "3xl" }}>
-								Edit Profile
-							</Heading>
-							<FormControl>
-								<Stack direction={["column", "row"]} spacing={6}>
-									<Center>
-										<Avatar
-											size="xl"
-											src={selectedFile || authUser.profilePicURL}
-											border={"2px solid white "}
-										/>
-									</Center>
-									<Center w="full">
-										<Button w="full" onClick={() => fileRef.current.click()}>
-											Edit Profile Picture
-										</Button>
-									</Center>
-									<Input type="file" hidden ref={fileRef} onChange={handleMediaChange} />
-								</Stack>
-							</FormControl>
-
-							<FormControl>
-								<FormLabel fontSize={"sm"}>Full Name</FormLabel>
-								<Input
-									placeholder="Full Name"
-									size="sm"
-									type="text"
-									value={inputs.fullName}
-									onChange={(e) => setInputs({ ...inputs, fullName: e.target.value })}
-								/>
-							</FormControl>
-
-							<FormControl>
-								<FormLabel fontSize={"sm"}>Username</FormLabel>
-								<Input
-									placeholder="Username"
-									size="sm"
-									type="text"
-									value={inputs.username}
-									onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
-								/>
-							</FormControl>
-
-							<FormControl>
-								<FormLabel fontSize={"sm"}>Bio</FormLabel>
-								<Input
-									placeholder="Bio"
-									size="sm"
-									type="text"
-									value={inputs.bio}
-									onChange={(e) => setInputs({ ...inputs, bio: e.target.value })}
-								/>
-							</FormControl>
-
-							<Stack spacing={6} direction={["column", "row"]}>
-								<Button
-									bg={"red.400"}
-									color={"white"}
-									w="full"
-									size="sm"
-									_hover={{ bg: "red.500" }}
-									onClick={onClose}
-								>
-									Cancel
-								</Button>
-								<Button
-									bg={"blue.400"}
-									color={"white"}
-									size="sm"
-									w="full"
-									_hover={{ bg: "blue.500" }}
-									onClick={handleEditProfile}
-									isLoading={isUpdating}
-								>
-									Submit
-								</Button>
-							</Stack>
-						</Stack>
+					<Flex direction="column" alignItems="center" mb={4}>
+						<Avatar src={preview} size="xl" mb={2} />
+						<Button as="label" htmlFor="file-upload" size="sm" colorScheme="blue">
+							Change Profile Picture
+						</Button>
+						<Input id="file-upload" type="file" hidden accept="image/*" onChange={handleFileChange} />
 					</Flex>
+
+					<FormControl>
+						<FormLabel fontSize={"sm"}>Full Name</FormLabel>
+						<Input
+							placeholder="Full Name"
+							size="sm"
+							type="text"
+							value={inputs.fullName}
+							onChange={(e) => setInputs({ ...inputs, fullName: e.target.value })}
+						/>
+					</FormControl>
+
+					<FormControl mt={2}>
+						<FormLabel fontSize={"sm"}>Username</FormLabel>
+						<Input
+							placeholder="Username"
+							size="sm"
+							type="text"
+							value={inputs.username}
+							onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
+						/>
+					</FormControl>
+
+					<FormControl mt={2}>
+						<FormLabel fontSize={"sm"}>Bio</FormLabel>
+						<Textarea
+							placeholder="Tell us about yourself..."
+							size="sm"
+							value={inputs.bio}
+							onChange={(e) => setInputs({ ...inputs, bio: e.target.value })}
+						/>
+					</FormControl>
+
+					<FormControl mt={2}>
+						<FormLabel fontSize={"sm"}>Location</FormLabel>
+						<Input
+							placeholder="Location"
+							size="sm"
+							type="text"
+							value={inputs.location}
+							onChange={(e) => setInputs({ ...inputs, location: e.target.value })}
+						/>
+					</FormControl>
+
+					<FormControl mt={2}>
+						<FormLabel fontSize={"sm"}>Profession</FormLabel>
+						<Input
+							placeholder="Profession (e.g., Actor, Director, Writer)"
+							size="sm"
+							type="text"
+							value={inputs.profession}
+							onChange={(e) => setInputs({ ...inputs, profession: e.target.value })}
+						/>
+						<Text fontSize="xs" color="gray.500" mt={1}>
+							Separate multiple professions with commas (e.g., "Actor, Director")
+						</Text>
+					</FormControl>
 				</ModalBody>
+
+				<ModalFooter>
+					<Button onClick={onClose} mr={3} size="sm">
+						Cancel
+					</Button>
+					<Button colorScheme="blue" onClick={handleSubmit} isLoading={isUpdating} size="sm">
+						Save Changes
+					</Button>
+				</ModalFooter>
 			</ModalContent>
 		</Modal>
 	);

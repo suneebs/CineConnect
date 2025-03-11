@@ -22,11 +22,10 @@ const useEditProfile = () => {
 		const storageRef = ref(storage, `profilePics/${authUser.uid}`);
 		const userDocRef = doc(firestore, "users", authUser.uid);
 
-		let URL = authUser.profilePicURL; // Default to existing profile picture
+		let URL = authUser.profilePicURL;
 
 		try {
 			if (file) {
-				// Upload file and get download URL
 				await uploadBytes(storageRef, file);
 				URL = await getDownloadURL(storageRef);
 			}
@@ -36,6 +35,8 @@ const useEditProfile = () => {
 				fullName: inputs.fullName.trim(),
 				username: inputs.username.trim(),
 				bio: inputs.bio.trim(),
+				location: inputs.location.trim(),
+				profession: Array.isArray(inputs.profession) ? inputs.profession : [inputs.profession],
 				profilePicURL: URL,
 			};
 
