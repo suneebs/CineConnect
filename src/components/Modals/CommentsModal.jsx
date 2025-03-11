@@ -20,6 +20,9 @@ const CommentsModal = ({ isOpen, onClose, post }) => {
 	const handleSubmitComment = async (e) => {
 		// do not refresh the page, prevent it
 		e.preventDefault();
+		const commentText = commentRef.current.value.trim(); // Remove leading/trailing spaces  
+	
+	if (!commentText) return; // Stop if empty
 		await handlePostComment(post.id, commentRef.current.value);
 		commentRef.current.value = "";
 	};

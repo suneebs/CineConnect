@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useAuthStore from "../store/authStore";
 import useShowToast from "./useShowToast";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { firestore, storage } from "../firebase/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import useUserProfileStore from "../store/userProfileStore";
@@ -15,35 +15,41 @@ const useEditProfile = () => {
 
 	const showToast = useShowToast();
 
-	const editProfile = async (inputs, selectedFile) => {
+	const editProfile = async (inputs, file) => {
 		if (isUpdating || !authUser) return;
 		setIsUpdating(true);
 
 		const storageRef = ref(storage, `profilePics/${authUser.uid}`);
 		const userDocRef = doc(firestore, "users", authUser.uid);
 
-		let URL = "";
+		let URL = authUser.profilePicURL;
+
 		try {
-			if (selectedFile) {
-				await uploadString(storageRef, selectedFile, "data_url");
-				URL = await getDownloadURL(ref(storage, `profilePics/${authUser.uid}`));
+			if (file) {
+				await uploadBytes(storageRef, file);
+				URL = await getDownloadURL(storageRef);
 			}
 
 			const updatedUser = {
 				...authUser,
-				fullName: inputs.fullName || authUser.fullName,
-				username: inputs.username || authUser.username,
-				bio: inputs.bio || authUser.bio,
-				profilePicURL: URL || authUser.profilePicURL,
+				fullName: inputs.fullName.trim(),
+				username: inputs.username.trim(),
+				bio: inputs.bio.trim(),
+				location: inputs.location.trim(),
+				profession: Array.isArray(inputs.profession) ? inputs.profession : [inputs.profession],
+				profilePicURL: URL,
 			};
 
 			await updateDoc(userDocRef, updatedUser);
+
 			localStorage.setItem("user-info", JSON.stringify(updatedUser));
 			setAuthUser(updatedUser);
 			setUserProfile(updatedUser);
 			showToast("Success", "Profile updated successfully", "success");
 		} catch (error) {
 			showToast("Error", error.message, "error");
+		} finally {
+			setIsUpdating(false);
 		}
 	};
 

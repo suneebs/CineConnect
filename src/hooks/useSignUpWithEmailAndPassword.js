@@ -10,13 +10,14 @@ const useSignUpWithEmailAndPassword = () => {
 	const loginUser = useAuthStore((state) => state.login);
 
 	const signup = async (inputs) => {
-		if (!inputs.email || !inputs.password || !inputs.username || !inputs.fullName) {
-			showToast("Error", "Please fill all the fields", "error");
+		if (!inputs.email || !inputs.password || !inputs.username || !inputs.fullName || !inputs.location) {
+			showToast("Error", "Please fill all required fields", "error");
 			return;
 		}
 
 		const usersRef = collection(firestore, "users");
 
+		// Check if the username already exists
 		const q = query(usersRef, where("username", "==", inputs.username));
 		const querySnapshot = await getDocs(q);
 
@@ -37,6 +38,8 @@ const useSignUpWithEmailAndPassword = () => {
 					email: inputs.email,
 					username: inputs.username,
 					fullName: inputs.fullName,
+					location: inputs.location,
+					profession: inputs.profession || [], // Store profession as an array (optional)
 					bio: "",
 					profilePicURL: "",
 					followers: [],

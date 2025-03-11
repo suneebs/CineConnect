@@ -38,6 +38,8 @@ const ProfilePost = ({ post }) => {
 	const deletePost = usePostStore((state) => state.deletePost);
 	const decrementPostsCount = useUserProfileStore((state) => state.deletePost);
 
+	const isVideo = post.type === "video";
+
 	const handleDeletePost = async () => {
 		if (!window.confirm("Are you sure you want to delete this post?")) return;
 		if (isDeleting) return;
@@ -104,7 +106,21 @@ const ProfilePost = ({ post }) => {
 					</Flex>
 				</Flex>
 
-				<Image src={post.imageURL} alt='profile post' w={"100%"} h={"100%"} objectFit={"cover"} />
+				{isVideo ? (
+					<video controls style={{
+						width: "100%",
+						height: "100%",
+						objectFit: "cover",
+						position: "absolute",
+						top: "0",
+						left: "0"
+					}}>
+						<source src={post.fileURL} type="video/mp4" />
+						Your browser does not support the video tag.
+					</video>
+				) : (
+					<Image src={post.fileURL} alt={"FEED POST IMG"} height="100%" width="100%" />
+				)}
 			</GridItem>
 
 			<Modal isOpen={isOpen} onClose={onClose} isCentered={true} size={{ base: "3xl", md: "5xl" }}>
@@ -128,12 +144,19 @@ const ProfilePost = ({ post }) => {
 								justifyContent={"center"}
 								alignItems={"center"}
 							>
-								<Image src={post.imageURL} alt='profile post' />
+								{isVideo ? (
+					<video controls width="100%" style={{ borderRadius: "4px" }}>
+						<source src={post.fileURL} type="video/mp4" />
+						Your browser does not support the video tag.
+					</video>
+				) : (
+					<Image src={post.fileURL} alt={"FEED POST IMG"} />
+				)}
 							</Flex>
 							<Flex flex={1} flexDir={"column"} px={10} display={{ base: "none", md: "flex" }}>
 								<Flex alignItems={"center"} justifyContent={"space-between"}>
 									<Flex alignItems={"center"} gap={4}>
-										<Avatar src={userProfile.profilePicURL} size={"sm"} name='As a Programmer' />
+										<Avatar src={userProfile.profilePicURL} size={"sm"} name='profile' />
 										<Text fontWeight={"bold"} fontSize={12}>
 											{userProfile.username}
 										</Text>

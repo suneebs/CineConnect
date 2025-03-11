@@ -16,6 +16,7 @@ const PostFooter = ({ post, isProfilePage, creatorProfile }) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	const handleSubmitComment = async () => {
+		if(comment === "") return;
 		await handlePostComment(post.id, comment);
 		setComment("");
 	};
