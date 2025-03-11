@@ -2,8 +2,8 @@ import { useState } from "react";
 import useShowToast from "./useShowToast";
 
 const usePreviewMedia = () => {
-	const [selectedFile, setSelectedFile] = useState(null); // Stores preview URL
-	const [file, setFile] = useState(null); // Stores actual File object
+	const [selectedFile, setSelectedFile] = useState(null); // Preview URL
+	const [file, setFile] = useState(null); // Actual File object
 	const [fileType, setFileType] = useState(null);
 	const showToast = useShowToast();
 
@@ -14,7 +14,7 @@ const usePreviewMedia = () => {
 		const selected = e.target.files[0];
 		if (!selected) return;
 
-		const type = selected.type.split("/")[0]; // "image" or "video"
+		const type = selected.type.split("/")[0];
 
 		if (type !== "image" && type !== "video") {
 			showToast("Error", "Please select an image or video file", "error");
@@ -23,23 +23,17 @@ const usePreviewMedia = () => {
 			return;
 		}
 
-		if (type === "image" && selected.size > maxImageSizeInBytes) {
-			showToast("Error", "Image size must be less than 2MB", "error");
+		if ((type === "image" && selected.size > maxImageSizeInBytes) ||
+			(type === "video" && selected.size > maxVideoSizeInBytes)) {
+			showToast("Error", `${type === "image" ? "Image" : "Video"} size too large`, "error");
 			setSelectedFile(null);
 			setFile(null);
 			return;
 		}
 
-		if (type === "video" && selected.size > maxVideoSizeInBytes) {
-			showToast("Error", "Video size must be less than 10MB", "error");
-			setSelectedFile(null);
-			setFile(null);
-			return;
-		}
-
-		setSelectedFile(URL.createObjectURL(selected)); // For preview
-    setFile(selected); // Store actual file
-    setFileType(type);
+		setSelectedFile(URL.createObjectURL(selected));
+		setFile(selected);
+		setFileType(type);
 	};
 
 	return { selectedFile, file, fileType, handleMediaChange, setSelectedFile, setFile };

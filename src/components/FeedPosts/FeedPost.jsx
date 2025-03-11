@@ -20,7 +20,7 @@ const FeedPost = ({ post }) => {
 						Your browser does not support the video tag.
 					</video>
 				) : (
-					<Image src={post.imageURL} alt={"FEED POST IMG"} />
+					<Image src={post.fileURL} alt={"FEED POST IMG"} />
 				)}
 			</Box>
 			<PostFooter post={post} creatorProfile={userProfile} />

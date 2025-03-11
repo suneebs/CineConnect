@@ -27,19 +27,19 @@ import useUserProfileStore from "../../store/userProfileStore";
 import { useLocation } from "react-router-dom";
 import { addDoc, arrayUnion, collection, doc, updateDoc } from "firebase/firestore";
 import { firestore, storage } from "../../firebase/firebase";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const CreatePost = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [caption, setCaption] = useState("");
 	const fileRef = useRef(null);
-	const { handleMediaChange, selectedFile, fileType, setSelectedFile } = usePreviewMedia();
+	const { handleMediaChange, selectedFile, fileType, file, setSelectedFile } = usePreviewMedia();
 	const showToast = useShowToast();
 	const { isLoading, handleCreatePost } = useCreatePost();
 
 	const handlePostCreation = async () => {
 		try {
-			await handleCreatePost(selectedFile, fileType, caption);
+			await handleCreatePost(file, fileType, caption);
 			onClose();
 			setCaption("");
 			setSelectedFile(null);
@@ -50,67 +50,34 @@ const CreatePost = () => {
 
 	return (
 		<>
-			<Tooltip
-				hasArrow
-				label={"Create"}
-				placement='right'
-				ml={1}
-				openDelay={500}
-				display={{ base: "block", md: "none" }}
-			>
-				<Flex
-					alignItems={"center"}
-					gap={4}
-					_hover={{ bg: "whiteAlpha.400" }}
-					borderRadius={6}
-					p={2}
-					w={{ base: 10, md: "full" }}
-					justifyContent={{ base: "center", md: "flex-start" }}
-					onClick={onOpen}
-				>
+			<Tooltip hasArrow label={"Create"} placement="right" ml={1} openDelay={500} display={{ base: "block", md: "none" }}>
+				<Flex alignItems={"center"} gap={4} _hover={{ bg: "whiteAlpha.400" }} borderRadius={6} p={2} w={{ base: 10, md: "full" }}
+					justifyContent={{ base: "center", md: "flex-start" }} onClick={onOpen}>
 					<CreatePostLogo />
 					<Box display={{ base: "none", md: "block" }}>Create</Box>
 				</Flex>
 			</Tooltip>
 
-			<Modal isOpen={isOpen} onClose={onClose} size='xl'>
+			<Modal isOpen={isOpen} onClose={onClose} size="xl">
 				<ModalOverlay />
-
 				<ModalContent bg={"black"} border={"1px solid gray"}>
 					<ModalHeader>Create Post</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody pb={6}>
-						<Textarea
-							placeholder='Post caption...'
-							value={caption}
-							onChange={(e) => setCaption(e.target.value)}
-						/>
-
-						<Input type='file' hidden ref={fileRef} onChange={handleMediaChange} accept="image/*,video/*" />
-
+						<Textarea placeholder="Post caption..." value={caption} onChange={(e) => setCaption(e.target.value)} />
+						<Input type="file" hidden ref={fileRef} onChange={handleMediaChange} accept="image/*,video/*" />
 						<Flex mt={3} gap={4}>
-    <MdPermMedia
-        onClick={() => fileRef.current.click()}
-        style={{ cursor: "pointer" }}
-        size={24}
-    />
-</Flex>
+							<MdPermMedia onClick={() => fileRef.current.click()} style={{ cursor: "pointer" }} size={24} />
+						</Flex>
 
 						{selectedFile && (
 							<Flex mt={5} w={"full"} position={"relative"} justifyContent={"center"}>
 								{fileType === "image" ? (
-									<Image src={selectedFile} alt='Selected media' />
+									<Image src={selectedFile} alt="Selected media" />
 								) : (
 									<video src={selectedFile} controls style={{ maxWidth: "100%" }} />
 								)}
-								<CloseButton
-									position={"absolute"}
-									top={2}
-									right={2}
-									onClick={() => {
-										setSelectedFile(null);
-									}}
-								/>
+								<CloseButton position={"absolute"} top={2} right={2} onClick={() => setSelectedFile(null)} />
 							</Flex>
 						)}
 					</ModalBody>
@@ -137,17 +104,18 @@ function useCreatePost() {
 	const userProfile = useUserProfileStore((state) => state.userProfile);
 	const { pathname } = useLocation();
 
-	const handleCreatePost = async (selectedFile, fileType, caption) => {
+	const handleCreatePost = async (file, fileType, caption) => {
 		if (isLoading) return;
-		if (!selectedFile) throw new Error("Please select an image or video");
+		if (!file) throw new Error("Please select an image or video");
 		setIsLoading(true);
+
 		const newPost = {
 			caption: caption,
 			likes: [],
 			comments: [],
 			createdAt: Date.now(),
 			createdBy: authUser.uid,
-			type: fileType, // Store type (image/video)
+			type: fileType,
 		};
 
 		try {
@@ -156,13 +124,12 @@ function useCreatePost() {
 			const fileRef = ref(storage, `posts/${postDocRef.id}`);
 
 			await updateDoc(userDocRef, { posts: arrayUnion(postDocRef.id) });
-			await uploadString(fileRef, selectedFile, "data_url");
+			await uploadBytes(fileRef, file);
 			const downloadURL = await getDownloadURL(fileRef);
 
 			await updateDoc(postDocRef, { fileURL: downloadURL });
 
 			newPost.fileURL = downloadURL;
-
 			if (userProfile.uid === authUser.uid) createPost({ ...newPost, id: postDocRef.id });
 
 			if (pathname !== "/" && userProfile.uid === authUser.uid) addPost({ ...newPost, id: postDocRef.id });
