@@ -54,7 +54,7 @@ const CreatePost = () => {
 				<Flex alignItems={"center"} gap={4} _hover={{ bg: "whiteAlpha.400" }} borderRadius={6} p={2} w={{ base: 10, md: "full" }}
 					justifyContent={{ base: "center", md: "flex-start" }} onClick={onOpen}>
 					<CreatePostLogo />
-					<Box display={{ base: "none", md: "block" }}>Create</Box>
+					<Box display={{ base: "none", md: "block" }}>Create Post</Box>
 				</Flex>
 			</Tooltip>
 
