@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../firebase/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const useFetchTalents = () => {
   const [talents, setTalents] = useState([]);
@@ -8,24 +8,31 @@ const useFetchTalents = () => {
 
   useEffect(() => {
     const fetchTalents = async () => {
-      const querySnapshot = await getDocs(collection(firestore, "users"));
-      const talentList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setTalents(talentList);
+      try {
+        const talentsCollection = collection(firestore, "users"); // Adjust the collection name
+        const snapshot = await getDocs(talentsCollection);
+        const talentsList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTalents(talentsList);
+      } catch (error) {
+        console.error("Error fetching talents:", error);
+      }
     };
 
     fetchTalents();
   }, []);
 
+  // ✅ Search filter logic
   const filteredTalents = talents.filter((talent) => {
-    const searchLower = searchQuery.toLowerCase();
+    const query = searchQuery.toLowerCase().trim();
+
     return (
-      searchQuery === "" ||
-      talent.name.toLowerCase().includes(searchLower) ||
-      talent.type.toLowerCase().includes(searchLower) ||
-      talent.location.toLowerCase().includes(searchLower)
+      talent.username.toLowerCase().includes(query) || // Search by username
+      talent.location?.toLowerCase().includes(query) || // Search by location
+      (Array.isArray(talent.profession) && 
+        talent.profession.some((prof) => prof.toLowerCase().includes(query))) // Search by profession
     );
   });
 

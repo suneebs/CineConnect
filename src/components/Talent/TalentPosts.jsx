@@ -1,11 +1,11 @@
 import { SimpleGrid, Text } from "@chakra-ui/react";
 import TalentPost from "./TalentPost";
-import useAuthStore from "../../store/authStore"; // ✅ Import auth store
+import useAuthStore from "../../store/authStore";
 
 const TalentPosts = ({ talents }) => {
-  const authUser = useAuthStore((state) => state.user); // ✅ Get current user
-  
-  // ✅ Filter out the current user's profile
+  const authUser = useAuthStore((state) => state.user);
+
+  // ✅ Exclude the logged-in user's profile
   const filteredTalents = talents.filter((talent) => talent.uid !== authUser?.uid);
 
   return (
