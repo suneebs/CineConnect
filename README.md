@@ -1,7 +1,3 @@
-# Fullstack Instagram Clone Tutorial
+# CineConnect
 
-### Built With React, Firebase && Chakra UI
-
-# [Tutorial](https://youtu.be/bQtAg7AFFrY)
-
-![Screenshot of App](https://i.ibb.co/PjkYLCk/Group-34.png)
+CineConnect is a social media platform designed for movie enthusiasts to connect, share, and discuss their favorite films. Users can create profiles, follow other users, post reviews, and engage in discussions about movies. The platform aims to build a community of cinephiles who can discover new films, share recommendations, and stay updated with the latest in the world of cinema.
