@@ -7,8 +7,8 @@ import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase/firebase";
 import TalentPage from "./pages/TalentPage/TalentPage";
-// import useUserProfileStore from "./store/userProfileStore";
 import useUserProfileStore from "./hooks/useUserProfileStore";
+import ChatPage from "./pages/chatPage/ChatPage";
 
 function App() {
 	const [authUser] = useAuthState(auth);
@@ -28,6 +28,7 @@ function App() {
 				<Route path='/auth' element={!authUser ? <AuthPage /> : <Navigate to='/' />} />
 				<Route path='/:username' element={<ProfilePage />} />
 				<Route path='/talents' element={<TalentPage />} />
+				<Route path='/messages' element={authUser ? <ChatPage /> : <Navigate to='/auth' />} />
 			</Routes>
 		</PageLayout>
 	);
