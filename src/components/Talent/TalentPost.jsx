@@ -2,6 +2,7 @@ import { Box, Image, Text, VStack, HStack, Button, Flex, Icon } from "@chakra-ui
 import { FaMapMarkerAlt } from "react-icons/fa";
 import useFollowUser from "../../hooks/useFollowUser";
 import useAuthStore from "../../store/authStore";
+import { Link } from "react-router-dom";
 
 const TalentPost = ({ talent, setTalents }) => {
   const { isFollowing, isUpdating, handleFollowUser } = useFollowUser(talent.uid);
@@ -28,13 +29,17 @@ const TalentPost = ({ talent, setTalents }) => {
   return (
     <Box borderWidth="1px" borderRadius="lg" overflow="hidden" w="full">
       {/* Full-size Image */}
+      <Link to={`/${talent.username}`}>
       <Image src={talent.profilePicURL} alt={talent.username} objectFit="cover" w="100%" h="200px" />
-
+      </Link>
+      
       {/* Talent Info */}
       <VStack spacing={3} p={4} align="start" w="100%">
         {/* Username & Follow Button */}
         <Flex justify="space-between" align="center" w="100%">
+          <Link to={`/${talent.username}`}>
           <Text fontWeight="bold">{talent.username}</Text>
+          </Link>
           {authUser?.uid !== talent.uid && ( // ✅ Hide button if it's the same user
             <Button
               size="sm"
