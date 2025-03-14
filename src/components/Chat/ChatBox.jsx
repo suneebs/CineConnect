@@ -1,57 +1,80 @@
-import { Box, Text, Input, Button, Avatar, Flex, IconButton } from "@chakra-ui/react";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import React, { useState, useEffect, useRef } from "react";
+import { firestore } from "../../firebase/firebase";
+import { collection, addDoc, orderBy, query, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { Box, VStack, HStack, Input, Button, Text, Avatar, Flex } from "@chakra-ui/react";
+import useAuth from "../../hooks/useAuth";
 
-const ChatBox = ({ chat, setSelectedChat }) => {
-  return (
-    <Box display="flex" flexDir="column" h="100vh" w="full">
-      {/* 🔹 HEADER - Back Button & User Info */}
-      <Flex align="center" p={4} borderBottom="1px solid gray" bg="gray.900">
-        <IconButton
-          icon={<ArrowBackIcon />}
-          onClick={() => setSelectedChat(null)} // 🔥 Fix: Properly resets selected chat
-          variant="ghost"
-          color="white"
-          aria-label="Go Back"
-        />
-        <Avatar src={chat.profilePicURL} size="md" ml={3} />
-        <Text fontSize="lg" fontWeight="bold" ml={3}>
-          {chat.username}
-        </Text>
-      </Flex>
+const ChatBox = ({ selectedChat, participantName, participantProfile }) => {
+    const { user } = useAuth();
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState("");
+    const messagesEndRef = useRef(null);
 
-      {/* 🔹 MESSAGE AREA */}
-      <Box flex="1" p={4} bg="gray.800" overflowY="auto">
-        {/* Sample Messages */}
-        <Box mt={4} display="flex" flexDir="column" gap={3}>
-          {/* Received Message */}
-          <Box alignSelf="flex-start" bg="gray.700" p={3} borderRadius="lg" maxW="70%">
-            <Text fontSize="sm">Hello! 👋</Text>
-            <Text fontSize="xs" color="gray.400" textAlign="right" mt={1}>
-              10:15 AM
-            </Text>
-          </Box>
+    useEffect(() => {
+        if (!selectedChat || !user) return;
 
-          {/* Sent Message */}
-          <Box alignSelf="flex-end" bg="blue.600" p={3} borderRadius="lg" maxW="70%">
-            <Text fontSize="sm" color="white">
-              Hi! How are you?
-            </Text>
-            <Text fontSize="xs" color="gray.300" textAlign="right" mt={1}>
-              10:17 AM
-            </Text>
-          </Box>
-        </Box>
-      </Box>
+        const messagesRef = collection(firestore, "chats", selectedChat.id, "messages");
+        const messagesQuery = query(messagesRef, orderBy("timestamp"));
 
-      {/* 🔹 FOOTER - Input & Send Button */}
-      <Flex p={3} borderTop="1px solid gray" bg="gray.900" align="center">
-        <Input placeholder="Type a message..." flex="1" />
-        <Button colorScheme="blue" ml={2}>
-          Send
-        </Button>
-      </Flex>
-    </Box>
-  );
+        const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+            const messagesData = snapshot.docs.map((doc) => doc.data());
+            setMessages(messagesData);
+        });
+
+        return () => unsubscribe();
+    }, [selectedChat, user]);
+
+    const sendMessage = async () => {
+        if (!newMessage.trim()) return;
+
+        await addDoc(collection(firestore, "chats", selectedChat.id, "messages"), {
+            sender: user.uid,
+            message: newMessage,
+            timestamp: serverTimestamp(),
+        });
+
+        setNewMessage("");
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    return (
+        <Flex flexDir="column" h="100%" w="100%">
+            {/* 🔹 Chat Header (Profile Picture & Name) */}
+            <HStack p={3} boxShadow="md" bg="gray.800">
+                <Avatar src={participantProfile} name={participantName} />
+                <Text fontWeight="bold">{participantName}</Text>
+            </HStack>
+
+            {/* Messages */}
+            <VStack flex="1" overflowY="auto" p={3} spacing={4} align="stretch">
+                {messages.map((msg, index) => (
+                    <HStack
+                        key={index}
+                        alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"}
+                        p={3}
+                        borderRadius="md"
+                        maxW="75%"
+                    >
+                        {msg.sender !== user.uid && <Avatar size="sm" />}
+                        <Text>{msg.message}</Text>
+                    </HStack>
+                ))}
+                <div ref={messagesEndRef} />
+            </VStack>
+
+            {/* Input Box */}
+            <HStack p={3} boxShadow="md">
+                <Input
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type a message..."
+                />
+                <Button onClick={sendMessage} colorScheme="blue">
+                    Send
+                </Button>
+            </HStack>
+        </Flex>
+    );
 };
 
 export default ChatBox;

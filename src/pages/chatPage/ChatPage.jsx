@@ -1,52 +1,95 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { firestore } from "../../firebase/firebase";
+import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
 import ChatList from "../../components/Chat/ChatList";
 import ChatBox from "../../components/Chat/ChatBox";
-import { useState } from "react";
+import { useParams } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const ChatPage = () => {
-  const [selectedChat, setSelectedChat] = useState(null);
+    const { user } = useAuth();
+    const { chatId } = useParams();
+    const [chats, setChats] = useState([]);
+    const [selectedChat, setSelectedChat] = useState(null);
 
-  return (
-    <Flex 
-      h="100vh"
-      bg="gray.900"         /* Unified background for the whole page */
-      color="white"         /* White text color for consistency */
-    >
-      {/* 🔹 Left: Chat List */}
-      <Box
-        w={{ base: "100%", xl: "30%" }}
-        h="full"
-        borderRight="1px solid gray"
-        display={{ base: selectedChat ? "none" : "block", md: "block" }}
-        bg="gray.800"        /* Slightly lighter for the chat list */
-      >
-        <ChatList
-          setSelectedChat={setSelectedChat}
-          selectedChat={selectedChat}
-        />
-      </Box>
+    useEffect(() => {
+        if (!user) return;
 
-      {/* 🔹 Right: Chat Box */}
-      <Box
-        w={{ base: "100%", xl: "70%" }}
-        h="full"
-        display={{ base: selectedChat ? "block" : "none", md: "block" }}
-      >
-        {selectedChat ? (
-          <ChatBox
-            chat={selectedChat}
-            setSelectedChat={setSelectedChat}
-          />
-        ) : (
-          <Box p={5} textAlign="center" h="full" display="flex" alignItems="center" justifyContent="center">
-            <Text fontSize="lg" color="gray.400">
-              Select a chat to start messaging
-            </Text>
-          </Box>
-        )}
-      </Box>
-    </Flex>
-  );
+        const chatQuery = query(
+            collection(firestore, "chats"),
+            where("participants", "array-contains", user.uid)
+        );
+
+        const unsubscribe = onSnapshot(chatQuery, async (snapshot) => {
+            const chatData = await Promise.all(snapshot.docs.map(async (docSnap) => {
+                const chat = { id: docSnap.id, ...docSnap.data() };
+
+                // Find the other participant
+                const otherUserId = chat.participants.find(id => id !== user.uid);
+
+                // Fetch user details
+                const userRef = doc(firestore, "users", otherUserId);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    return {
+                        ...chat,
+                        participantName: userData.fullName,
+                        participantProfile: userData.profilePicURL,
+                    };
+                }
+
+                return chat;
+            }));
+
+            setChats(chatData);
+        });
+
+        return () => unsubscribe();
+    }, [user]);
+
+    useEffect(() => {
+        if (chatId) {
+            const fetchChat = async () => {
+                const chatRef = doc(firestore, "chats", chatId);
+                const chatSnap = await getDoc(chatRef);
+
+                if (chatSnap.exists()) {
+                    const chatData = chatSnap.data();
+                    const otherUserId = chatData.participants.find(id => id !== user.uid);
+
+                    // Fetch user details
+                    const userRef = doc(firestore, "users", otherUserId);
+                    const userSnap = await getDoc(userRef);
+
+                    if (userSnap.exists()) {
+                        setSelectedChat({
+                            id: chatId,
+                            ...chatData,
+                            participantName: userSnap.data().fullName,
+                            participantProfile: userSnap.data().profilePicURL,
+                        });
+                    }
+                }
+            };
+
+            fetchChat();
+        }
+    }, [chatId]);
+
+    return (
+        <div style={{ display: "flex", height: "100vh" }}>
+            <ChatList chats={chats} setSelectedChat={setSelectedChat} selectedChat={selectedChat}  />
+            {selectedChat && (
+                <ChatBox 
+                    selectedChat={selectedChat} 
+                    participantName={selectedChat?.participantName} 
+                    participantProfile={selectedChat?.participantProfile} 
+                />
+            )}
+        </div>
+    );
 };
 
 export default ChatPage;

@@ -1,72 +1,41 @@
-import { VStack, Box, Avatar, Text, Badge } from "@chakra-ui/react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Avatar, Text, VStack, HStack } from "@chakra-ui/react";
 
-const ChatList = ({ setSelectedChat, selectedChat }) => {
-  // Dummy chat users
-  const dummyChatUsers = [
-    {
-      id: "1",
-      username: "John Doe",
-      profilePicURL: "https://randomuser.me/api/portraits/men/1.jpg",
-      lastMessage: "Hey! How are you?",
-      lastMessageTime: "2h ago",
-      unreadCount: 2,
-    },
-    {
-      id: "2",
-      username: "Jane Smith",
-      profilePicURL: "https://randomuser.me/api/portraits/women/2.jpg",
-      lastMessage: "Let's catch up tomorrow!",
-      lastMessageTime: "1d ago",
-      unreadCount: 0,
-    },
-    {
-      id: "3",
-      username: "Michael Scott",
-      profilePicURL: "https://randomuser.me/api/portraits/men/3.jpg",
-      lastMessage: "That's what she said! 😂",
-      lastMessageTime: "3d ago",
-      unreadCount: 5,
-    },
-  ];
+const ChatList = ({ chats, setSelectedChat, selectedChat }) => {
+    const navigate = useNavigate();
 
-  return (
-    <VStack spacing={4} p={4} align="start" w="full">
-      {dummyChatUsers.map((chat) => (
-        <Box
-          key={chat.id}
-          display="flex"
-          alignItems="center"
-          gap={3}
-          w="full"
-          p={3}
-          borderRadius="md"
-          bg={selectedChat?.id === chat.id ? "gray.700" : "gray.800"}
-          cursor="pointer"
-          _hover={{ bg: "gray.700" }}
-          onClick={() => setSelectedChat(chat)}
-          position="relative"
-        >
-          <Avatar src={chat.profilePicURL} size="md" />
-          <Box flex="1">
-            <Text fontWeight="bold">{chat.username}</Text>
-            <Text fontSize="sm" color="gray.400" isTruncated>
-              {chat.lastMessage}
-            </Text>
-          </Box>
-          <Box textAlign="right">
-            <Text fontSize="xs" color="gray.400">
-              {chat.lastMessageTime}
-            </Text>
-            {chat.unreadCount > 0 && (
-              <Badge colorScheme="blue" borderRadius="full" px={2}>
-                {chat.unreadCount}
-              </Badge>
+    return (
+        <VStack spacing={3} w="full" align="stretch">
+            {chats.length > 0 ? (
+                chats.map((chat) => (
+                    <HStack
+                        key={chat.id}
+                        p={3}
+                        borderRadius="md"
+                        bg={selectedChat?.id === chat.id ? "gray.700" : "transparent"}
+                        _hover={{ bg: "gray.900", cursor: "pointer" }}
+                        onClick={() => {
+                            setSelectedChat(chat);
+                            navigate(`/chat/${chat.id}`);
+                        }}
+                    >
+                        <Avatar src={chat.participantProfile} name={chat.participantName} />
+                        <Box>
+                            <Text fontWeight="bold">{chat.participantName}</Text>
+                            <Text fontSize="sm" color="gray.500" noOfLines={1}>
+                                {chat.lastMessage || "No messages yet"}
+                            </Text>
+                        </Box>
+                    </HStack>
+                ))
+            ) : (
+                <Text textAlign="center" color="gray.500">
+                    No chats yet.
+                </Text>
             )}
-          </Box>
-        </Box>
-      ))}
-    </VStack>
-  );
+        </VStack>
+    );
 };
 
 export default ChatList;
