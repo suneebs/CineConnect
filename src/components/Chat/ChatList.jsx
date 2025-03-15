@@ -13,7 +13,7 @@ const ChatList = ({ chats, setSelectedChat, selectedChat }) => {
                         key={chat.id}
                         p={3}
                         borderRadius="md"
-                        bg={selectedChat?.id === chat.id ? "gray.700" : "transparent"}
+                        bg={selectedChat?.id === chat.id ? "grey.700" : "transparent"}
                         _hover={{ bg: "gray.900", cursor: "pointer" }}
                         onClick={() => {
                             setSelectedChat(chat);
@@ -21,10 +21,10 @@ const ChatList = ({ chats, setSelectedChat, selectedChat }) => {
                         }}
                     >
                         <Avatar src={chat.participantProfile} name={chat.participantName} />
-                        <Box>
+                        <Box flex="1">
                             <Text fontWeight="bold">{chat.participantName}</Text>
                             <Text fontSize="sm" color="gray.500" noOfLines={1}>
-                                {chat.lastMessage || "No messages yet"}
+                                {chat.lastMessage ? chat.lastMessage : "No messages yet"}
                             </Text>
                         </Box>
                     </HStack>
