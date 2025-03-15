@@ -5,6 +5,7 @@ import { Box, VStack, HStack, Input, Button, Text, Avatar, Flex, IconButton } fr
 import { FiSend } from "react-icons/fi";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import useAuth from "../../hooks/useAuth";
+import { format,isToday,isYesterday } from "date-fns";
 
 const ChatBox = ({ selectedChat, participantName, participantProfile, setSelectedChat }) => {
     const { user } = useAuth();
@@ -45,6 +46,29 @@ const ChatBox = ({ selectedChat, participantName, participantProfile, setSelecte
         setNewMessage("");
     };
 
+    const groupMessagesByDate = () => {
+        const groupedMessages = {};
+        messages.forEach((msg) => {
+            const date = msg.timestamp?.toDate() || new Date();
+            let formattedDate;
+if (isToday(date)) {
+    formattedDate = "Today";
+} else if (isYesterday(date)) {
+    formattedDate = "Yesterday";
+} else {
+    formattedDate = format(date, "PP");
+}
+         
+            if (!groupedMessages[formattedDate]) {
+                groupedMessages[formattedDate] = [];
+            }
+            groupedMessages[formattedDate].push(msg);
+        });
+        return groupedMessages;
+    };
+
+    const groupedMessages = groupMessagesByDate();
+
     return (
         <Flex flexDir="column" h="100%" w="100%" bg="gray.900" borderRadius="md" boxShadow="lg">
             <HStack p={4} bg="gray.800" borderRadius="md" boxShadow="sm">
@@ -54,23 +78,28 @@ const ChatBox = ({ selectedChat, participantName, participantProfile, setSelecte
             </HStack>
 
             <VStack flex="1" overflowY="auto" p={4} spacing={4} align="stretch">
-                {messages.map((msg) => (
-                    <VStack
-                        key={msg.id}
-                        alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"}
-                        p={3}
-                        borderRadius="lg"
-                        bg={msg.sender === user.uid ? "blue.500" : "gray.700"}
-                        color="white"
-                        maxW="75%"
-                        spacing={1}
-                    >
-                        <Text>{msg.message}</Text>
-                        {msg.timestamp && (
-                            <Text fontSize="xs" color="gray.300" alignSelf="flex-end">
-                                {msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
-                            </Text>
-                        )}
+                {Object.keys(groupedMessages).map((date) => (
+                    <VStack key={date} align="stretch">
+                        <Text align="center" color="gray.400" fontSize="sm" fontWeight="bold" my={2}>{date}</Text>
+                        {groupedMessages[date].map((msg) => (
+                            <VStack
+                                key={msg.id}
+                                alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"}
+                                p={3}
+                                borderRadius="lg"
+                                bg={msg.sender === user.uid ? "blue.500" : "gray.700"}
+                                color="white"
+                                maxW="75%"
+                                spacing={1}
+                            >
+                                <Text>{msg.message}</Text>
+                                {msg.timestamp && (
+                                    <Text fontSize="xs" color="gray.300" alignSelf="flex-end">
+                                        {format(msg.timestamp.toDate(), "hh:mm a")}
+                                    </Text>
+                                )}
+                            </VStack>
+                        ))}
                     </VStack>
                 ))}
                 <div ref={messagesEndRef} />
