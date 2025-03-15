@@ -86,6 +86,7 @@ const ChatPage = () => {
                     selectedChat={selectedChat} 
                     participantName={selectedChat?.participantName} 
                     participantProfile={selectedChat?.participantProfile} 
+                    setSelectedChat={setSelectedChat}
                 />
             )}
         </div>

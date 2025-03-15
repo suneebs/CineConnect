@@ -1,11 +1,12 @@
-// ChatBox.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { firestore } from "../../firebase/firebase";
 import { collection, addDoc, orderBy, query, onSnapshot, serverTimestamp, updateDoc, doc } from "firebase/firestore";
-import { Box, VStack, HStack, Input, Button, Text, Avatar, Flex } from "@chakra-ui/react";
+import { Box, VStack, HStack, Input, Button, Text, Avatar, Flex, IconButton } from "@chakra-ui/react";
+import { FiSend } from "react-icons/fi";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import useAuth from "../../hooks/useAuth";
 
-const ChatBox = ({ selectedChat, participantName, participantProfile }) => {
+const ChatBox = ({ selectedChat, participantName, participantProfile, setSelectedChat }) => {
     const { user } = useAuth();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
@@ -45,25 +46,46 @@ const ChatBox = ({ selectedChat, participantName, participantProfile }) => {
     };
 
     return (
-        <Flex flexDir="column" h="100%" w="100%">
-            <HStack p={3} boxShadow="md" bg="gray.800">
+        <Flex flexDir="column" h="100%" w="100%" bg="gray.900" borderRadius="md" boxShadow="lg">
+            <HStack p={4} bg="gray.800" borderRadius="md" boxShadow="sm">
+                <IconButton icon={<ArrowBackIcon />} onClick={() => setSelectedChat(null)} colorScheme="gray" aria-label="Back" />
                 <Avatar src={participantProfile} name={participantName} />
-                <Text fontWeight="bold">{participantName}</Text>
+                <Text fontWeight="bold" color="white">{participantName}</Text>
             </HStack>
 
-            <VStack flex="1" overflowY="auto" p={3} spacing={4} align="stretch">
+            <VStack flex="1" overflowY="auto" p={4} spacing={4} align="stretch">
                 {messages.map((msg) => (
-                    <HStack key={msg.id} alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"} p={3} borderRadius="md" maxW="75%">
-                        {msg.sender !== user.uid && <Avatar size="sm" />}
+                    <VStack
+                        key={msg.id}
+                        alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"}
+                        p={3}
+                        borderRadius="lg"
+                        bg={msg.sender === user.uid ? "blue.500" : "gray.700"}
+                        color="white"
+                        maxW="75%"
+                        spacing={1}
+                    >
                         <Text>{msg.message}</Text>
-                    </HStack>
+                        {msg.timestamp && (
+                            <Text fontSize="xs" color="gray.300" alignSelf="flex-end">
+                                {msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            </Text>
+                        )}
+                    </VStack>
                 ))}
                 <div ref={messagesEndRef} />
             </VStack>
 
-            <HStack p={3} boxShadow="md">
-                <Input value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type a message..." />
-                <Button onClick={sendMessage} colorScheme="blue">Send</Button>
+            <HStack p={4} bg="gray.800" borderRadius="md" boxShadow="sm">
+                <Input
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type a message..."
+                    bg="gray.700"
+                    color="white"
+                    _placeholder={{ color: "gray.400" }}
+                />
+                <IconButton icon={<FiSend />} onClick={sendMessage} colorScheme="blue" aria-label="Send" />
             </HStack>
         </Flex>
     );
