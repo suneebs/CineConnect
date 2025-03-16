@@ -71,9 +71,9 @@ if (isToday(date)) {
 
     return (
         <Flex flexDir="column" h="100%" w="100%" bg="gray.900" borderRadius="md" boxShadow="lg">
-            <HStack p={4} bg="gray.800" borderRadius="md" boxShadow="sm">
-                <IconButton icon={<ArrowBackIcon />} onClick={() => setSelectedChat(null)} colorScheme="gray" aria-label="Back" />
-                <Avatar src={participantProfile} name={participantName} />
+            <HStack p={2} bg="gray.800" borderRadius="md" boxShadow="sm">
+                <IconButton icon={<ArrowBackIcon />} onClick={() => setSelectedChat(null)} aria-label="Back" boxSize={0} />
+                <Avatar src={participantProfile} name={participantName} boxSize={8} />
                 <Text fontWeight="bold" color="white">{participantName}</Text>
             </HStack>
 
@@ -85,16 +85,18 @@ if (isToday(date)) {
                             <VStack
                                 key={msg.id}
                                 alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"}
-                                p={3}
+                                p={1}
                                 borderRadius="lg"
                                 bg={msg.sender === user.uid ? "blue.500" : "gray.700"}
                                 color="white"
                                 maxW="75%"
+                                minW="15%"
                                 spacing={1}
+                                alignItems="start"
                             >
                                 <Text>{msg.message}</Text>
                                 {msg.timestamp && (
-                                    <Text fontSize="xs" color="gray.300" alignSelf="flex-end">
+                                    <Text fontSize="0.65rem" color="gray.300" alignSelf="flex-end">
                                         {format(msg.timestamp.toDate(), "hh:mm a")}
                                     </Text>
                                 )}
