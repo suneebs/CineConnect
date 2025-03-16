@@ -1,20 +1,27 @@
 import React, { useState, useEffect, useRef } from "react";
 import { firestore } from "../../firebase/firebase";
-import { collection, addDoc, orderBy, query, onSnapshot, serverTimestamp, updateDoc, doc } from "firebase/firestore";
-import { Box, VStack, HStack, Input, Button, Text, Avatar, Flex, IconButton } from "@chakra-ui/react";
+import {
+    collection, addDoc, orderBy, query, onSnapshot, serverTimestamp, updateDoc, doc, getDoc
+} from "firebase/firestore";
+import {
+    Box, VStack, HStack, Input, IconButton, Text, Avatar, Flex
+} from "@chakra-ui/react";
 import { FiSend } from "react-icons/fi";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import useAuth from "../../hooks/useAuth";
-import { format,isToday,isYesterday } from "date-fns";
+import { format, isToday, isYesterday } from "date-fns";
 
 const ChatBox = ({ selectedChat, participantName, participantProfile, setSelectedChat }) => {
     const { user } = useAuth();
     const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState("");
+    const [newMessage, setNewMessage] = useState("");  // ✅ Fixed state
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
         if (!selectedChat || !user) return;
+
+        const chatRef = doc(firestore, "chats", selectedChat.id);
+        updateDoc(chatRef, { [`unseenMessages.${user.uid}`]: 0 }); // ✅ Mark messages as seen
 
         const messagesRef = collection(firestore, "chats", selectedChat.id, "messages");
         const messagesQuery = query(messagesRef, orderBy("timestamp"));
@@ -22,43 +29,67 @@ const ChatBox = ({ selectedChat, participantName, participantProfile, setSelecte
         const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
             const messagesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
             setMessages(messagesData);
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        });
+            setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "instant" });  // 🔥 Instant Scroll (No Smooth)
+            }, 100);        });
 
         return () => unsubscribe();
     }, [selectedChat, user]);
 
     const sendMessage = async () => {
-        if (!newMessage.trim()) return;
+        if (!newMessage.trim()) return;  // ✅ Prevent empty messages
 
-        const messageData = {
-            sender: user.uid,
-            message: newMessage,
-            timestamp: serverTimestamp(),
-        };
+        console.log("Sending message:", newMessage); // ✅ Debugging line
 
-        await addDoc(collection(firestore, "chats", selectedChat.id, "messages"), messageData);
-        await updateDoc(doc(firestore, "chats", selectedChat.id), {
-            lastMessage: newMessage,
-            lastMessageTimestamp: serverTimestamp(),
-        });
+        if (!selectedChat || !user) {
+            console.error("No selected chat or user!");
+            return;
+        }
 
-        setNewMessage("");
+        try {
+            const chatRef = doc(firestore, "chats", selectedChat.id);
+            const chatSnap = await getDoc(chatRef);
+
+            if (!chatSnap.exists()) {
+                console.error("Chat document does not exist!");
+                return;
+            }
+
+            const chatData = chatSnap.data();
+            const otherUserId = chatData.participants.find(id => id !== user.uid);
+
+            const newUnreadCounts = { ...chatData.unreadCounts };
+            newUnreadCounts[otherUserId] = (newUnreadCounts[otherUserId] || 0) + 1;
+
+            await addDoc(collection(firestore, "chats", selectedChat.id, "messages"), {
+                sender: user.uid,
+                message: newMessage.trim(),
+                timestamp: serverTimestamp(),
+            });
+
+            await updateDoc(chatRef, {
+                lastMessage: newMessage.trim(),
+                lastMessageTimestamp: serverTimestamp(),
+                unreadCounts: newUnreadCounts,
+            });
+
+            setNewMessage("");  // ✅ Clear input after sending
+            console.log("Message sent successfully! ✅");
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
     };
 
     const groupMessagesByDate = () => {
         const groupedMessages = {};
         messages.forEach((msg) => {
             const date = msg.timestamp?.toDate() || new Date();
-            let formattedDate;
-if (isToday(date)) {
-    formattedDate = "Today";
-} else if (isYesterday(date)) {
-    formattedDate = "Yesterday";
-} else {
-    formattedDate = format(date, "PP");
-}
-         
+            let formattedDate = isToday(date)
+                ? "Today"
+                : isYesterday(date)
+                ? "Yesterday"
+                : format(date, "PP");
+
             if (!groupedMessages[formattedDate]) {
                 groupedMessages[formattedDate] = [];
             }
@@ -72,7 +103,7 @@ if (isToday(date)) {
     return (
         <Flex flexDir="column" h="100%" w="100%" bg="gray.900" borderRadius="md" boxShadow="lg">
             <HStack p={2} bg="gray.800" borderRadius="md" boxShadow="sm">
-                <IconButton icon={<ArrowBackIcon />} onClick={() => setSelectedChat(null)} aria-label="Back" boxSize={0} />
+                <IconButton icon={<ArrowBackIcon />} onClick={() => setSelectedChat(null)} aria-label="Back" />
                 <Avatar src={participantProfile} name={participantName} boxSize={8} />
                 <Text fontWeight="bold" color="white">{participantName}</Text>
             </HStack>
@@ -85,7 +116,7 @@ if (isToday(date)) {
                             <VStack
                                 key={msg.id}
                                 alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"}
-                                p={1}
+                                p={2}
                                 borderRadius="lg"
                                 bg={msg.sender === user.uid ? "blue.500" : "gray.700"}
                                 color="white"
@@ -116,7 +147,12 @@ if (isToday(date)) {
                     color="white"
                     _placeholder={{ color: "gray.400" }}
                 />
-                <IconButton icon={<FiSend />} onClick={sendMessage} colorScheme="blue" aria-label="Send" />
+                <IconButton
+                    icon={<FiSend />}
+                    onClick={sendMessage} // ✅ Directly calls function
+                    colorScheme="blue"
+                    aria-label="Send"
+                />
             </HStack>
         </Flex>
     );

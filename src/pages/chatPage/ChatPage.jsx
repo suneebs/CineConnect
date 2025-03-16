@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { firestore } from "../../firebase/firebase";
-import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
 import ChatList from "../../components/Chat/ChatList";
 import ChatBox from "../../components/Chat/ChatBox";
 import { useParams } from "react-router-dom";
@@ -12,6 +12,7 @@ const ChatPage = () => {
     const [chats, setChats] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
 
+    // ✅ Fetch chats dynamically
     useEffect(() => {
         if (!user) return;
 
@@ -37,50 +38,49 @@ const ChatPage = () => {
                         ...chat,
                         participantName: userData.fullName,
                         participantProfile: userData.profilePicURL,
+                        unreadCount: chat.unreadCounts?.[user.uid] || 0, // ✅ Ensure unread count is always a number
                     };
                 }
 
                 return chat;
             }));
 
+            console.log("Updated Chats:", chatData);
             setChats(chatData);
         });
 
         return () => unsubscribe();
     }, [user]);
 
-    useEffect(() => {
-        if (chatId) {
-            const fetchChat = async () => {
-                const chatRef = doc(firestore, "chats", chatId);
-                const chatSnap = await getDoc(chatRef);
-
-                if (chatSnap.exists()) {
-                    const chatData = chatSnap.data();
-                    const otherUserId = chatData.participants.find(id => id !== user.uid);
-
-                    // Fetch user details
-                    const userRef = doc(firestore, "users", otherUserId);
-                    const userSnap = await getDoc(userRef);
-
-                    if (userSnap.exists()) {
-                        setSelectedChat({
-                            id: chatId,
-                            ...chatData,
-                            participantName: userSnap.data().fullName,
-                            participantProfile: userSnap.data().profilePicURL,
-                        });
-                    }
-                }
-            };
-
-            fetchChat();
+    // ✅ Reset unread count when opening a chat
+    const markMessagesAsRead = async (chatId) => {
+        if (!chatId || !user) return;
+    
+        const chatRef = doc(firestore, "chats", chatId);
+        const chatSnap = await getDoc(chatRef);
+    
+        if (!chatSnap.exists()) return;
+    
+        const chatData = chatSnap.data();
+    
+        if (chatData.unreadCounts?.[user.uid] > 0) {
+            const newUnreadCounts = { ...chatData.unreadCounts, [user.uid]: 0 };
+    
+            await updateDoc(chatRef, {
+                unreadCounts: newUnreadCounts, // 🔥 Reset unread count
+            });
         }
-    }, [chatId]);
+    };
+    
+    useEffect(() => {
+        if (chatId && user) {
+            markMessagesAsRead(chatId);
+        }
+    }, [chatId, user]);
 
     return (
         <div style={{ display: "flex", height: "100vh" }}>
-            <ChatList chats={chats} setSelectedChat={setSelectedChat} selectedChat={selectedChat}  />
+            <ChatList chats={chats} setSelectedChat={setSelectedChat} selectedChat={selectedChat} />
             {selectedChat && (
                 <ChatBox 
                     selectedChat={selectedChat} 

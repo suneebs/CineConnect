@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, updateDoc, doc } from "firebase/firestore";
 import { firestore } from "../firebase/firebase";
 
-const useFetchMessages = (chatId) => {
+const useFetchMessages = (chatId, currentUserId) => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
@@ -13,16 +13,22 @@ const useFetchMessages = (chatId) => {
       orderBy("timestamp", "asc")
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
       const messagesData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setMessages(messagesData);
+
+      // ✅ Mark all unseen messages as seen
+      const unseenMessages = messagesData.filter(msg => !msg.seen && msg.senderId !== currentUserId);
+      for (const message of unseenMessages) {
+        await updateDoc(doc(firestore, "chats", chatId, "messages", message.id), { seen: true });
+      }
     });
 
     return () => unsubscribe();
-  }, [chatId]);
+  }, [chatId, currentUserId]);
 
   return messages;
 };
