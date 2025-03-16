@@ -1,28 +1,28 @@
-import { doc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../firebase/firebase";
+import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 const useSendMessage = () => {
-  const sendMessage = async (chatId, senderId, receiverId, text) => {
-    if (!text.trim()) return;
+  const sendMessage = async (chatId, senderId, text) => {
+    if (!chatId || !senderId || !text.trim()) return;
 
-    const chatRef = doc(firestore, "chats", chatId);
-    const messageRef = doc(firestore, `chats/${chatId}/messages`, Date.now().toString());
-
-    await setDoc(messageRef, {
+    const messageData = {
       senderId,
       text,
       timestamp: serverTimestamp(),
       seen: false,
-    });
+    };
 
-    await updateDoc(chatRef, {
+    // Add message to Firestore
+    await addDoc(collection(firestore, "chats", chatId, "messages"), messageData);
+
+    // Update lastMessage in chat document
+    await updateDoc(doc(firestore, "chats", chatId), {
       lastMessage: text,
-      lastMessageTime: serverTimestamp(),
-      unreadMessages: { [receiverId]: (chatRef.unreadMessages?.[receiverId] || 0) + 1 },
+      timestamp: serverTimestamp(),
     });
   };
 
-  return { sendMessage };
+  return sendMessage;
 };
 
 export default useSendMessage;

@@ -1,5 +1,7 @@
+import { firestore } from "../../firebase/firebase";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { Avatar, AvatarGroup, Box, Button, Flex, Text, VStack, useDisclosure } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate for navigation
+import { useNavigate } from "react-router-dom"; 
 import useUserProfileStore from "../../store/userProfileStore";
 import useAuthStore from "../../store/authStore";
 import EditProfile from "./EditProfile";
@@ -10,34 +12,69 @@ const ProfileHeader = () => {
   const authUser = useAuthStore((state) => state.user);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isFollowing, isUpdating, handleFollowUser } = useFollowUser(userProfile?.uid);
-  const navigate = useNavigate(); // ✅ Initialize useNavigate
+  const navigate = useNavigate();
 
   const visitingOwnProfileAndAuth = authUser && authUser.username === userProfile.username;
   const visitingAnotherProfileAndAuth = authUser && authUser.username !== userProfile.username;
 
+  const handleMessage = async () => {
+    if (!authUser || !userProfile) return;
+
+    const userId1 = authUser.uid;
+    const userId2 = userProfile.uid;
+
+    if (!userId1 || !userId2) return;
+
+    // Check if chat already exists
+    const chatQuery = query(
+      collection(firestore, "chats"),
+      where("participants", "array-contains", userId1)
+    );
+
+    const chatSnapshot = await getDocs(chatQuery);
+    let chatId = null;
+
+    chatSnapshot.forEach((doc) => {
+      const chatData = doc.data();
+      if (chatData.participants.includes(userId2)) {
+        chatId = doc.id;
+      }
+    });
+
+    // If no chat exists, create a new one
+    if (!chatId) {
+      const chatRef = await addDoc(collection(firestore, "chats"), {
+        participants: [userId1, userId2],
+        lastMessage: "",
+        lastUpdated: new Date(),
+      });
+      chatId = chatRef.id;
+    }
+
+    // Navigate to chat and ensure ChatBox opens
+    navigate(`/chat/${chatId}`);
+  };
+
   return (
     <Flex gap={{ base: 4, sm: 10 }} py={10} direction={{ base: "column", sm: "row" }}>
-      {/* ✅ Avatar Section */}
       <VStack>
         <AvatarGroup size={{ base: "xl", md: "2xl" }} justifySelf={"center"} alignSelf={"flex-start"} mx={"auto"}>
           <Avatar src={userProfile.profilePicURL} alt="Profile Pic" />
         </AvatarGroup>
 
-        {/* ✅ Message Button BELOW Avatar */}
         {visitingAnotherProfileAndAuth && (
           <Button
             bg={"green.500"}
             color={"white"}
             _hover={{ bg: "green.600" }}
             size={{ base: "xs", md: "sm" }}
-            onClick={() => navigate(`/messages?user=${userProfile.username}`)}
+            onClick={handleMessage}
           >
             Message
           </Button>
         )}
       </VStack>
 
-      {/* ✅ User Info Section */}
       <VStack alignItems={"start"} gap={2} mx={"auto"} flex={1}>
         <Flex
           gap={4}
@@ -48,7 +85,6 @@ const ProfileHeader = () => {
         >
           <Text fontSize={{ base: "sm", md: "lg" }}>{userProfile.username}</Text>
 
-          {/* If visiting own profile, show "Edit Profile" button */}
           {visitingOwnProfileAndAuth && (
             <Button
               bg={"blue.500"}
@@ -61,7 +97,6 @@ const ProfileHeader = () => {
             </Button>
           )}
 
-          {/* If visiting another profile, show "Follow" button */}
           {visitingAnotherProfileAndAuth && (
             <Button
               bg={"blue.500"}
@@ -111,7 +146,7 @@ const ProfileHeader = () => {
         <Flex gap={2} wrap="wrap">
           {Array.isArray(userProfile?.profession) && userProfile.profession.filter((prof) => prof.trim() !== "").length > 0 ? (
             userProfile.profession
-              .filter((prof) => prof.trim() !== "") // Remove empty strings
+              .filter((prof) => prof.trim() !== "") 
               .map((prof, index) => (
                 <Box key={index} bg="gray.700" color="white" borderRadius="md" px={2} py={1}>
                   {prof}
