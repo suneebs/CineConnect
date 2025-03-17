@@ -47,10 +47,16 @@ const ChatPage = () => {
             }));
 
             setChats(chatData);
+
+            // ✅ Auto-select chat if chatId is in URL
+            if (chatId) {
+                const selected = chatData.find(chat => chat.id === chatId);
+                if (selected) setSelectedChat(selected);
+            }
         });
 
         return () => unsubscribe();
-    }, [user]);
+    }, [user, chatId]);
 
     // ✅ Reset unread count when opening a chat
     const markMessagesAsRead = async (chatId) => {
