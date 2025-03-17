@@ -14,10 +14,15 @@ const useFetchChats = (currentUserId) => {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const chatData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const chatData = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          unseenMessages: data.unseenMessages?.[currentUserId] || 0, // Fetch unseen messages for current user
+        };
+      });
+
       setChats(chatData);
     });
 
