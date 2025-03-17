@@ -37,7 +37,7 @@ const ChatPage = () => {
                     const userData = userSnap.data();
                     return {
                         ...chat,
-                        participantName: userData.fullName,
+                        participantName: userData.username,
                         participantProfile: userData.profilePicURL,
                         unreadCount: chat.unreadCounts?.[user.uid] || 0, // ✅ Ensure unread count is always a number
                     };

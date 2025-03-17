@@ -13,6 +13,7 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import useAuth from "../../hooks/useAuth";
 import { format, isToday, isYesterday } from "date-fns";
+import { Link } from "react-router-dom";
 
 const ChatBox = ({ selectedChat, participantName, participantProfile, setSelectedChat }) => {
     const { user } = useAuth();
@@ -185,8 +186,13 @@ const ChatBox = ({ selectedChat, participantName, participantProfile, setSelecte
             <HStack p={2} bg="gray.800" borderRadius="md" boxShadow="sm" justify="space-between">
                 <HStack>
                     <IconButton icon={<ArrowBackIcon />} onClick={() => setSelectedChat(null)} aria-label="Back" />
+                    <Link to={`/${participantName}`} >
+                    <Flex alignItems="center" gap={2}>
+
                     <Avatar src={participantProfile} name={participantName} boxSize={8} />
                     <Text fontWeight="bold" color="white">{participantName}</Text>
+                    </Flex>
+                    </Link>
                 </HStack>
 
                 {/* 3-dot Menu */}

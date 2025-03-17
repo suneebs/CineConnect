@@ -66,12 +66,12 @@ const ChatList = ({ chats, setSelectedChat, selectedChat }) => {
                     >
                         <Avatar src={chat.participantProfile} name={chat.participantName} />
                         <Box flex="1">
-                            <Text fontWeight="bold">{chat.participantName}</Text>
+                            <Text >{chat.participantName}</Text>
                             <Text fontSize="sm" color="gray.500" noOfLines={1}>
                                 {chat.lastMessage ? chat.lastMessage : "No messages yet"}
                             </Text>
                         </Box>
-                        <Spacer />
+                        {/* <Spacer /> */}
                         {/* ✅ Show unread badge if unreadCount > 0 */}
                         {chat.unreadCount > 0 && (
                             <Badge colorScheme="blue" color="white" borderRadius="full" px={2} fontSize="xs">
