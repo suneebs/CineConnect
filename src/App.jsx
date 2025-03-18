@@ -22,17 +22,17 @@ function App() {
 	}, [authUser, fetchUserProfile]);
 
 	return (
-		<PageLayout>
-			<Routes>
-				<Route path='/' element={authUser ? <HomePage /> : <Navigate to='/auth' />} />
-				<Route path='/auth' element={!authUser ? <AuthPage /> : <Navigate to='/' />} />
-				<Route path='/:username' element={<ProfilePage />} />
-				<Route path='/talents' element={<TalentPage />} />
-				{/* ✅ Fix: Add route for ChatPage */}
-				<Route path='/messages' element={authUser ? <ChatPage /> : <Navigate to='/auth' />} />
-				<Route path='/chat/:chatId' element={authUser ? <ChatPage /> : <Navigate to='/auth' />} />
-			</Routes>
-		</PageLayout>
+			<PageLayout>
+				<Routes>
+					<Route path='/' element={authUser ? <HomePage /> : <Navigate to='/auth' />} />
+					<Route path='/auth' element={!authUser ? <AuthPage /> : <Navigate to='/' />} />
+					<Route path='/:username' element={<ProfilePage />} />
+					<Route path='/talents' element={<TalentPage />} />
+					{/* ✅ Fix: Add route for ChatPage */}
+					<Route path='/messages' element={authUser ? <ChatPage /> : <Navigate to='/auth' />} />
+					<Route path='/chat/:chatId' element={authUser ? <ChatPage /> : <Navigate to='/auth' />} />
+				</Routes>
+			</PageLayout>
 	);
 }
 

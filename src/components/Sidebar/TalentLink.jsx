@@ -9,6 +9,7 @@ const TalentLink = () => {
       label="Talent Directory"
       ml={1}
       openDelay={500}
+      placement='right'
       display={{ base: "block", md: "none" }}
     >
       <Link
