@@ -14,20 +14,21 @@ const ProfilePage = () => {
 	if (userNotFound) return <UserNotFound />;
 
 	return (
-		<Container maxW='container.lg' py={5}>
-			<Flex py={10} px={4} pl={{ base: 4, md: 10 }} w={"full"} mx={"auto"} flexDirection={"column"}>
+		<Container maxW='container.lg'>
+			<Flex pl={{ base: 4, md: 10 }} w={"full"} mx={"auto"} flexDirection={"column"}>
 				{!isLoading && userProfile && <ProfileHeader />}
 				{isLoading && <ProfileHeaderSkeleton />}
 			</Flex>
 			<Flex
-				px={{ base: 2, sm: 4 }}
+				px={{ base: 3, sm: 4 }}
 				maxW={"full"}
 				mx={"auto"}
 				borderTop={"1px solid"}
 				borderColor={"whiteAlpha.300"}
 				direction={"column"}
+				pt={10}
 			>
-				<ProfileTabs />
+				{/* <ProfileTabs /> */}
 				<ProfilePosts />
 			</Flex>
 		</Container>
