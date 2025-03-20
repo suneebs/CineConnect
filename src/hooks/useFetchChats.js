@@ -1,40 +1,35 @@
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { firestore } from "../firebase/firebase";
-import useAuthStore from "../store/authStore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
-const useFetchChats = () => {
-  const authUser = useAuthStore((state) => state.user);
-  const [chatUsers, setChatUsers] = useState([]);
+const useFetchChats = (currentUserId) => {
+  const [chats, setChats] = useState([]);
 
   useEffect(() => {
-    if (!authUser) return;
+    if (!currentUserId) return;
 
-    const q = query(collection(firestore, "chats"), orderBy("lastMessageTime", "desc"));
+    const q = query(
+      collection(firestore, "chats"),
+      where("users", "array-contains", currentUserId)
+    );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedChats = snapshot.docs.map(doc => {
-        const chatData = doc.data();
-        const lastMessage = chatData.lastMessage || "";
-        const lastMessageTime = chatData.lastMessageTime || "";
-        const unreadCount = chatData.unreadMessages?.[authUser.uid] || 0;
-
+      const chatData = snapshot.docs.map((doc) => {
+        const data = doc.data();
         return {
           id: doc.id,
-          ...chatData,
-          lastMessage,
-          lastMessageTime,
-          unreadCount,
+          ...data,
+          unseenMessages: data.unseenMessages?.[currentUserId] || 0, // Fetch unseen messages for current user
         };
       });
 
-      setChatUsers(fetchedChats);
+      setChats(chatData);
     });
 
     return () => unsubscribe();
-  }, [authUser]);
+  }, [currentUserId]);
 
-  return { chatUsers };
+  return chats;
 };
 
 export default useFetchChats;
