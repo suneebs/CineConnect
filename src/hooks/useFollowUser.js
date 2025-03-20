@@ -4,6 +4,7 @@ import useUserProfileStore from "../store/userProfileStore";
 import useShowToast from "./useShowToast";
 import { firestore } from "../firebase/firebase";
 import { arrayRemove, arrayUnion, doc, updateDoc, getDoc } from "firebase/firestore";
+import useSendNotification from "./useSendNotification";
 
 const useFollowUser = (userId) => {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -12,6 +13,7 @@ const useFollowUser = (userId) => {
   const setAuthUser = useAuthStore((state) => state.setUser);
   const { userProfile, setUserProfile } = useUserProfileStore();
   const showToast = useShowToast();
+  const sendNotification = useSendNotification();
 
   const handleFollowUser = async () => {
     if (!authUser || !userId) return;
@@ -45,6 +47,14 @@ const useFollowUser = (userId) => {
         setUserProfile({
           ...userProfile,
           followers: updatedFollowers,
+        });
+      }
+      // ✅ Send notification to the user being followed
+      if(!isFollowing) {
+        await sendNotification(userId, "follow", {
+          uid: authUser.uid,
+          username: authUser.username,
+          profilePic: authUser.profilePicURL || "",
         });
       }
 
