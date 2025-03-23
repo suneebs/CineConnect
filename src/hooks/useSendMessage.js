@@ -1,28 +1,29 @@
-import { doc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../firebase/firebase";
+import { collection, addDoc, doc, updateDoc, serverTimestamp, increment } from "firebase/firestore";
 
 const useSendMessage = () => {
   const sendMessage = async (chatId, senderId, receiverId, text) => {
-    if (!text.trim()) return;
+    if (!chatId || !senderId || !receiverId || !text.trim()) return;
 
-    const chatRef = doc(firestore, "chats", chatId);
-    const messageRef = doc(firestore, `chats/${chatId}/messages`, Date.now().toString());
-
-    await setDoc(messageRef, {
+    const messageData = {
       senderId,
       text,
       timestamp: serverTimestamp(),
       seen: false,
-    });
+    };
 
-    await updateDoc(chatRef, {
+    // Add message to Firestore
+    await addDoc(collection(firestore, "chats", chatId, "messages"), messageData);
+
+    // Update chat metadata (lastMessage, unreadCounts)
+    await updateDoc(doc(firestore, "chats", chatId), {
       lastMessage: text,
-      lastMessageTime: serverTimestamp(),
-      unreadMessages: { [receiverId]: (chatRef.unreadMessages?.[receiverId] || 0) + 1 },
+      lastMessageTimestamp: serverTimestamp(),
+      [`unreadCounts.${receiverId}`]: increment(1), // Increase unread count for receiver
     });
   };
 
-  return { sendMessage };
+  return sendMessage;
 };
 
 export default useSendMessage;

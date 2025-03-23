@@ -7,6 +7,7 @@ const MessagesLink = () => {
     <Tooltip
       hasArrow
       label="Messages"
+      placement='right'
       ml={1}
       openDelay={500}
       display={{ base: "block", md: "none" }}
