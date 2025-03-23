@@ -181,80 +181,116 @@ const ChatBox = ({ selectedChat, participantName, participantProfile, setSelecte
     const groupedMessages = groupMessagesByDate();
 
     return (
-        <Flex flexDir="column" h="100%" w="100%" bg="gray.900" borderRadius="md" boxShadow="lg">
-            {/* Chat Header */}
-            <HStack p={2} bg="gray.800" borderRadius="md" boxShadow="sm" justify="space-between">
-                <HStack>
-                    <IconButton icon={<ArrowBackIcon />} onClick={() => setSelectedChat(null)} aria-label="Back" />
-                    <Link to={`/${participantName}`} >
+    <Flex 
+        flexDir="column" 
+        h="100%" 
+        w="100%" 
+        bgGradient="linear(to-br, #0A0F1F, #162447, #1F4068, #1B1B2F)" 
+    >
+        {/* Chat Header */}
+        <HStack 
+            p={1} 
+            bg="rgba(255, 255, 255, 0.05)" 
+            justify="space-between"
+        >
+            <HStack>
+                <IconButton 
+                    icon={<ArrowBackIcon />} 
+                    onClick={() => setSelectedChat(null)} 
+                    aria-label="Back" 
+                    color="white" 
+                    bg="transparent" 
+                    _hover={{ bg: "rgba(255, 255, 255, 0.1)" }} 
+                />
+                <Link to={`/${participantName}`}>
                     <Flex alignItems="center" gap={2}>
-
-                    <Avatar src={participantProfile} name={participantName} boxSize={8} />
-                    <Text fontWeight="bold" color="white">{participantName}</Text>
+                        <Avatar src={participantProfile} name={participantName} boxSize={8} />
+                        <Text fontWeight="bold" color="white">{participantName}</Text>
                     </Flex>
-                    </Link>
-                </HStack>
-
-                {/* 3-dot Menu */}
-                <Menu>
-                    <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} aria-label="Options" variant="ghost" />
-                    <MenuList bg="gray.700">
-                        <MenuItem onClick={clearChat}>Clear Chat</MenuItem>
-                        <MenuItem color="red.400" onClick={deleteChat}>Delete Chat</MenuItem>
-                    </MenuList>
-                </Menu>
+                </Link>
             </HStack>
 
-            {/* Messages List */}
-            <VStack flex="1" overflowY="auto" p={4} spacing={4} align="stretch">
-                {Object.keys(groupedMessages).map((date) => (
-                    <VStack key={date} align="stretch">
-                        <Text align="center" color="gray.400" fontSize="sm" fontWeight="bold" my={2}>{date}</Text>
-                        {groupedMessages[date].map((msg) => (
-                            <VStack
-                                key={msg.id}
-                                alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"}
-                                p={2}
-                                borderRadius="lg"
-                                bg={msg.sender === user.uid ? "blue.500" : "gray.700"}
-                                color="white"
-                                maxW="75%"
-                                minW="15%"
-                                spacing={1}
-                                alignItems="start"
-                            >
-                                <Text>{msg.message}</Text>
-                                {msg.timestamp && (
-                                    <Text fontSize="0.65rem" color="gray.300" alignSelf="flex-end">
-                                        {format(msg.timestamp.toDate(), "hh:mm a")}
-                                    </Text>
-                                )}
-                            </VStack>
-                        ))}
-                    </VStack>
-                ))}
-                <div ref={messagesEndRef} />
-            </VStack>
-
-            {/* Message Input */}
-            <HStack p={4} bg="gray.800" borderRadius="md" boxShadow="sm">
-                <Input
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type a message..."
-                    bg="gray.700"
+            {/* 3-dot Menu */}
+            <Menu>
+                <MenuButton 
+                    as={IconButton} 
+                    icon={<BsThreeDotsVertical />} 
+                    aria-label="Options" 
+                    variant="ghost" 
                     color="white"
-                    _placeholder={{ color: "gray.400" }}
                 />
-                <IconButton
-                    icon={<FiSend />}
-                    onClick={sendMessage}
-                    colorScheme="blue"
-                    aria-label="Send"
-                />
-            </HStack>
-        </Flex>
-    );
+                <MenuList bg="gray.800" border="none">
+                    <MenuItem _hover={{ bg: "gray.700" }} onClick={clearChat}>Clear Chat</MenuItem>
+                    <MenuItem _hover={{ bg: "gray.700" }} color="red.400" onClick={deleteChat}>Delete Chat</MenuItem>
+                </MenuList>
+            </Menu>
+        </HStack>
+
+        {/* Messages List */}
+        <VStack 
+            flex="1" 
+            overflowY="auto" 
+            p={2} 
+            spacing={1} 
+            align="stretch"
+        >
+            {Object.keys(groupedMessages).map((date) => (
+                <VStack key={date} align="stretch">
+                    <Text align="center" color="gray.400" fontSize="sm" fontWeight="bold" my={1}>{date}</Text>
+                    {groupedMessages[date].map((msg) => (
+                        <VStack
+                            key={msg.id}
+                            alignSelf={msg.sender === user.uid ? "flex-end" : "flex-start"}
+                            p={1} 
+                            borderRadius="lg"
+                            bg={msg.sender === user.uid ? "blue.600" : "gray.700"}
+                            color="white"
+                            maxW="75%"
+                            minW="15%"
+                            spacing={1}
+                            alignItems="start"
+                            boxShadow="0px 2px 6px rgba(0, 0, 0, 0.3)"
+                        >
+                            <Text>{msg.message}</Text>
+                            {msg.timestamp && (
+                                <Text fontSize="0.65rem" color="gray.300" alignSelf="flex-end">
+                                    {format(msg.timestamp.toDate(), "hh:mm a")}
+                                </Text>
+                            )}
+                        </VStack>
+                    ))}
+                </VStack>
+            ))}
+            <div ref={messagesEndRef} />
+        </VStack>
+
+        {/* Message Input */}
+        <HStack 
+            p={2} 
+            bg="rgba(255, 255, 255, 0.05)"  
+        >
+            <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type a message..."
+                bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                _placeholder={{ color: "gray.400" }}
+                _focus={{ bg: "rgba(255, 255, 255, 0.2)" }}
+            />
+            <IconButton
+                icon={<FiSend />}
+                onClick={sendMessage}
+                bg="blue.500"
+                _hover={{ bg: "blue.600" }}
+                color="white"
+                boxShadow="0 0 8px rgba(0, 122, 255, 0.6)"
+                aria-label="Send"
+            />
+        </HStack>
+    </Flex>
+);
+
 };
 
 export default ChatBox;

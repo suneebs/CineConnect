@@ -7,7 +7,6 @@ import {
     VStack,
     HStack,
     Badge,
-    Spacer,
     Input,
     InputGroup,
     InputLeftElement,
@@ -32,20 +31,26 @@ const ChatList = ({ chats, setSelectedChat, selectedChat }) => {
     );
 
     return (
-        <VStack spacing={3} w="full" align="stretch">
+        <VStack spacing={0} w="full" align="stretch">
             {/* ✅ Search Bar */}
-            <Box p={3}>
+            <Box p={3} mt={5}>
                 <InputGroup>
                     <InputLeftElement pointerEvents="none">
-                        <Icon as={SearchIcon} color="gray.500" />
+                        <Icon as={SearchIcon} color="gray.400" />
                     </InputLeftElement>
                     <Input
                         placeholder="Search user..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        bg="gray.800"
+                        bg="rgba(255, 255, 255, 0.08)"
                         borderRadius="md"
-                        _focus={{ bg: "gray.700" }}
+                        border="1px solid rgba(255, 255, 255, 0.2)"
+                        color="whiteAlpha.900"
+                        _placeholder={{ color: "gray.400" }}
+                        _focus={{
+                            bg: "rgba(255, 255, 255, 0.12)",
+                            borderColor: "blue.400",
+                        }}
                     />
                 </InputGroup>
             </Box>
@@ -56,9 +61,9 @@ const ChatList = ({ chats, setSelectedChat, selectedChat }) => {
                     <HStack
                         key={chat.id}
                         p={1}
-                        borderRadius="md"
-                        bg={selectedChat?.id === chat.id ? "gray.700" : "transparent"}
-                        _hover={{ bg: "gray.900", cursor: "pointer" }}
+                        bg={selectedChat?.id === chat.id ? "rgba(255, 255, 255, 0.1)" : "transparent"}
+                        _hover={{ bg: "rgba(255, 255, 255, 0.15)", cursor: "pointer" }}
+                        transition="0.2s ease-in-out"
                         onClick={() => {
                             setSelectedChat(chat);
                             navigate(`/chat/${chat.id}`);
@@ -66,15 +71,24 @@ const ChatList = ({ chats, setSelectedChat, selectedChat }) => {
                     >
                         <Avatar src={chat.participantProfile} name={chat.participantName} />
                         <Box flex="1">
-                            <Text >{chat.participantName}</Text>
-                            <Text fontSize="sm" color="gray.500" noOfLines={1}>
+                            <Text color="whiteAlpha.900" fontWeight="medium">
+                                {chat.participantName}
+                            </Text>
+                            <Text fontSize="sm" color="gray.400" noOfLines={1}>
                                 {chat.lastMessage ? chat.lastMessage : "No messages yet"}
                             </Text>
                         </Box>
-                        {/* <Spacer /> */}
+
                         {/* ✅ Show unread badge if unreadCount > 0 */}
                         {chat.unreadCount > 0 && (
-                            <Badge colorScheme="blue" color="white" borderRadius="full" px={2} fontSize="xs">
+                            <Badge
+                                bg="blue.500"
+                                color="white"
+                                borderRadius="full"
+                                px={2}
+                                fontSize="xs"
+                                boxShadow="0 0 6px rgba(0, 122, 255, 0.6)"
+                            >
                                 {chat.unreadCount}
                             </Badge>
                         )}
