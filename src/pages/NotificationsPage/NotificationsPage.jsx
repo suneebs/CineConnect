@@ -58,16 +58,12 @@ const NotificationsPage = () => {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const notifs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      console.log("Notifications:", notifs);
       setNotifications(notifs);
     });
 
     return () => unsubscribe();
   }, [authUser]);
-
-  const markAsSeen = async (notifId) => {
-    const notifRef = doc(firestore, "notifications", notifId);
-    await updateDoc(notifRef, { seen: true });
-  };
 
   const clearAllNotifications = async () => {
     const batchDelete = notifications.map((notif) =>
@@ -101,31 +97,32 @@ const NotificationsPage = () => {
       {notifications.length === 0 ? (
         <Text color="gray.500" textAlign="center">No new notifications yet.</Text>
       ) : (
-        <VStack spacing={3} align="stretch">
+        <VStack spacing={1} align="stretch">
           {Object.entries(categorizedNotifications).map(([category, notifs]) =>
             notifs.length > 0 && (
               <Box key={category}>
                 <Text fontSize="md" fontWeight="bold" color="gray.400" mb={2}>
                   {category}
                 </Text>
-                <VStack spacing={2} align="stretch">
+                <VStack spacing={1} align="stretch">
                   {notifs.map((notif) => (
                     <Box
                       key={notif.id}
-                      p={3}
+                      p={2}
                       borderRadius="lg"
-                      bg={notif.seen ? "gray.700" : "gray.800"}
-                      cursor="pointer"
-                      _hover={{ bg: "gray.600" }}
-                      onClick={() => markAsSeen(notif.id)}
+                      bg="gray.900"
                     >
-                      <HStack spacing={3}>
+                      <HStack spacing={2}>
                         <Avatar size="sm" src={notif.senderProfilePic || ""} />
-                        <Box flex="1">
+                        <Box flex="full">
                           <Text fontSize="sm" fontWeight="bold">
                             {notif.senderName}{" "}
                             <Text as="span" fontWeight="normal">
-                              {notif.type === "like" ? "liked your post." : "started following you."}
+                              {notif.type === "comment"
+                                ? `commented on a post: "${notif.commentText}"`
+                                : notif.type === "like"
+                                ? "liked your post."
+                                : "started following you."}
                             </Text>
                           </Text>
                         </Box>
