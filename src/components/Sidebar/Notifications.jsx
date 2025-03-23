@@ -13,7 +13,7 @@ const Notifications = () => {
     };
 
     return (
-        <Tooltip hasArrow label={"Notifications"} placement="right" ml={1} openDelay={500}>
+        <Tooltip hasArrow label={"Notifications"} placement="right" ml={1} openDelay={500} display={ { base:"block", md:"none"}}>
             <Flex
                 alignItems={"center"}
                 gap={4}
