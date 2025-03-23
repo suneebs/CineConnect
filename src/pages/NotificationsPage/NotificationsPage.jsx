@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react";
 import { 
-  Box, Container, Text, Avatar, VStack, HStack, Button, Spacer 
+  Box, Container, Text, Avatar, VStack, HStack, Spacer 
 } from "@chakra-ui/react";
-import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { 
+  collection, query, where, orderBy, onSnapshot, deleteDoc, doc, updateDoc 
+} from "firebase/firestore";
 import { firestore } from "../../firebase/firebase";
 import useAuthStore from "../../store/authStore";
 
 const formatTime = (timestamp) => {
-  return new Date(timestamp?.toDate()).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  });
+  if (!timestamp) return "Unknown";
+  const date = timestamp.toDate();
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+
+  if (diffInSeconds < 60) return "Just now";
+  return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric", hour12: true });
 };
 
-// Function to categorize notifications
+// Categorize notifications based on time
 const categorizeNotifications = (notifications) => {
   const today = new Date();
   const categories = {
@@ -26,21 +30,14 @@ const categorizeNotifications = (notifications) => {
   };
 
   notifications.forEach((notif) => {
-    const notifDate = new Date(notif.timestamp?.toDate());
-    const diffTime = today - notifDate;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const notifDate = notif.timestamp?.toDate();
+    const diffDays = Math.floor((today - notifDate) / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) {
-      categories.Today.push(notif);
-    } else if (diffDays === 1) {
-      categories.Yesterday.push(notif);
-    } else if (diffDays <= 7) {
-      categories["This Week"].push(notif);
-    } else if (diffDays <= 30) {
-      categories["This Month"].push(notif);
-    } else {
-      categories.Older.push(notif);
-    }
+    if (diffDays === 0) categories.Today.push(notif);
+    else if (diffDays === 1) categories.Yesterday.push(notif);
+    else if (diffDays <= 7) categories["This Week"].push(notif);
+    else if (diffDays <= 30) categories["This Month"].push(notif);
+    else categories.Older.push(notif);
   });
 
   return categories;
@@ -83,45 +80,53 @@ const NotificationsPage = () => {
 
   return (
     <Container maxW="container.sm" py={5}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={5}>
-        <Text fontSize="2xl" fontWeight="bold">Notifications</Text>
-        {notifications.length > 0 && (
-          <Text
-            fontSize="sm"
-            color="blue.400"
-            cursor="pointer"
-            onClick={clearAllNotifications}
-          >
-            Clear All
-          </Text>
-        )}
+      <Box align="center" mb={5}>
+        <Text fontSize="2xl" fontWeight="bold" textAlign="center">
+          Notifications
+        </Text>
       </Box>
+
+      {notifications.length > 0 && (
+        <Text
+          align="right"
+          fontSize="sm"
+          color="blue.400"
+          cursor="pointer"
+          onClick={clearAllNotifications}
+        >
+          Clear All
+        </Text>
+      )}
 
       {notifications.length === 0 ? (
         <Text color="gray.500" textAlign="center">No new notifications yet.</Text>
       ) : (
-        <VStack spacing={2} align="stretch">
-          {Object.entries(categorizedNotifications).map(([category, notifs]) => (
+        <VStack spacing={3} align="stretch">
+          {Object.entries(categorizedNotifications).map(([category, notifs]) =>
             notifs.length > 0 && (
               <Box key={category}>
-                <Text fontSize="md" fontWeight="bold" color="gray.400" textAlign="left" mb={2}>
+                <Text fontSize="md" fontWeight="bold" color="gray.400" mb={2}>
                   {category}
                 </Text>
-                <VStack spacing={1} align="stretch">
+                <VStack spacing={2} align="stretch">
                   {notifs.map((notif) => (
-                    <Box 
+                    <Box
                       key={notif.id}
-                      p={2}
+                      p={3}
                       borderRadius="lg"
-                      bg="gray.800"
-                      onClick={() => markAsSeen(notif.id)}
+                      bg={notif.seen ? "gray.700" : "gray.800"}
                       cursor="pointer"
+                      _hover={{ bg: "gray.600" }}
+                      onClick={() => markAsSeen(notif.id)}
                     >
-                      <HStack spacing={2} align="center">
-                        <Avatar size="sm" src={notif.senderProfilePic} />
-                        <Box flex="9">
+                      <HStack spacing={3}>
+                        <Avatar size="sm" src={notif.senderProfilePic || ""} />
+                        <Box flex="1">
                           <Text fontSize="sm" fontWeight="bold">
-                            {notif.senderName} <Text as="span" fontWeight="normal">started following you.</Text>
+                            {notif.senderName}{" "}
+                            <Text as="span" fontWeight="normal">
+                              {notif.type === "like" ? "liked your post." : "started following you."}
+                            </Text>
                           </Text>
                         </Box>
                         <Spacer />
@@ -134,7 +139,7 @@ const NotificationsPage = () => {
                 </VStack>
               </Box>
             )
-          ))}
+          )}
         </VStack>
       )}
     </Container>
