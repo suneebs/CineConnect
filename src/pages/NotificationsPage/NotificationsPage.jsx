@@ -21,6 +21,14 @@ const formatTime = (timestamp) => {
 // Categorize notifications based on time
 const categorizeNotifications = (notifications) => {
   const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset to midnight to avoid time issues
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const oneWeekAgo = new Date(today);
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const oneMonthAgo = new Date(today);
+  oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+
   const categories = {
     Today: [],
     Yesterday: [],
@@ -30,18 +38,27 @@ const categorizeNotifications = (notifications) => {
   };
 
   notifications.forEach((notif) => {
-    const notifDate = notif.timestamp?.toDate();
-    const diffDays = Math.floor((today - notifDate) / (1000 * 60 * 60 * 24));
+    if (!notif.timestamp) return; // Handle missing timestamps
 
-    if (diffDays === 0) categories.Today.push(notif);
-    else if (diffDays === 1) categories.Yesterday.push(notif);
-    else if (diffDays <= 7) categories["This Week"].push(notif);
-    else if (diffDays <= 30) categories["This Month"].push(notif);
-    else categories.Older.push(notif);
+    const notifDate = notif.timestamp.toDate();
+    notifDate.setHours(0, 0, 0, 0); // Reset to midnight
+
+    if (notifDate.getTime() === today.getTime()) {
+      categories.Today.push(notif);
+    } else if (notifDate.getTime() === yesterday.getTime()) {
+      categories.Yesterday.push(notif);
+    } else if (notifDate >= oneWeekAgo) {
+      categories["This Week"].push(notif);
+    } else if (notifDate >= oneMonthAgo) {
+      categories["This Month"].push(notif);
+    } else {
+      categories.Older.push(notif);
+    }
   });
 
   return categories;
 };
+
 
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
