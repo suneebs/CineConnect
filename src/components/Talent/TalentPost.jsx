@@ -27,7 +27,7 @@ const TalentPost = ({ talent, setTalents }) => {
   };
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" w="full">
+    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" w="full" transition="0.2s ease-in-out" _hover={{transform: "scale(1.02)",}}>
       {/* Full-size Image */}
       <Link to={`/${talent.username}`}>
       <Image src={talent.profilePicURL} alt={talent.username} objectFit="cover" w="100%" h="200px" />
