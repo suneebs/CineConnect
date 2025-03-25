@@ -4,7 +4,8 @@ import Notifications from "./Notifications";
 import ProfileLink from "./ProfileLink";
 import Search from "./Search";
 import TalentLink from "./TalentLink";
-import MessagesLink from "./MessagesLink"; // ✅ Import MessagesLink
+import MessagesLink from "./MessagesLink"; 
+import JobLink from "./JobLink";
 
 const SidebarItems = () => {
   return (
@@ -14,6 +15,7 @@ const SidebarItems = () => {
       <Notifications />
       <CreatePost />
       <TalentLink />
+      <JobLink />
       <MessagesLink />
       <ProfileLink />
     </>
