@@ -10,11 +10,12 @@ import { BrowserRouter } from "react-router-dom";
 const styles = {
 	global: (props) => ({
 		body: {
-			bg: mode("gray.100", "#000")(props),
+			bgGradient: "linear(to-br, #0A0F1F, #162447, #1F4068, #1B1B2F)",
 			color: mode("gray.800", "whiteAlpha.900")(props),
 		},
 	}),
 };
+
 
 const config = {
 	initialColorMode: "dark",

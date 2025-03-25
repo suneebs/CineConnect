@@ -2,7 +2,7 @@ import { Input, Flex, Box } from "@chakra-ui/react";
 
 const TalentHeader = ({ searchQuery, setSearchQuery }) => {
   return (
-    <Box mb={6} mt={3} borderBottom="1px solid" borderColor="whiteAlpha.300">
+    <Box mb={6} mt={3} borderBottom="1px solid" borderColor="whiteAlpha.300" >
       <h1 style={{ fontSize: "1.8rem", fontWeight: "bold" }}>Cinema Talent Directory</h1>
       <p>Discover talented professionals in the cinema industry</p>
 
@@ -11,6 +11,8 @@ const TalentHeader = ({ searchQuery, setSearchQuery }) => {
           placeholder="Search talents by name, type, or location..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          borderColor="gray.200"
+				  _placeholder={{ color: "gray.400" }}
         />
       </Flex>
     </Box>

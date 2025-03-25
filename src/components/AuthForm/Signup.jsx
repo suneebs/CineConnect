@@ -121,6 +121,8 @@ const Signup = () => {
 				size={"sm"}
 				value={inputs.email}
 				onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
+				borderColor="gray.200"
+				_placeholder={{ color: "gray.400" }}
 			/>
 			<Input
 				placeholder='Username'
@@ -129,6 +131,8 @@ const Signup = () => {
 				size={"sm"}
 				value={inputs.username}
 				onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
+				borderColor="gray.200"
+				_placeholder={{ color: "gray.400" }}
 			/>
 			<Input
 				placeholder='Full Name'
@@ -137,6 +141,8 @@ const Signup = () => {
 				size={"sm"}
 				value={inputs.fullName}
 				onChange={(e) => setInputs({ ...inputs, fullName: e.target.value })}
+				borderColor="gray.200"
+				_placeholder={{ color: "gray.400" }}
 			/>
 
 			{/* Location Input with Suggestions */}
@@ -148,6 +154,8 @@ const Signup = () => {
 				list="location-suggestions"
 				value={inputs.location}
 				onChange={(e) => setInputs({ ...inputs, location: e.target.value })}
+				borderColor="gray.200"
+				_placeholder={{ color: "gray.400" }}
 			/>
 			<datalist id="location-suggestions">
 				{locationSuggestions.map((loc, index) => (
@@ -164,7 +172,9 @@ const Signup = () => {
 					size={"sm"}
 					value={professionInput}
 					onChange={(e) => setProfessionInput(e.target.value)}
-					onKeyDown={handleKeyDown} // Allow Enter key
+					onKeyDown={handleKeyDown} 
+					borderColor="gray.200"
+				_placeholder={{ color: "gray.400" }}
 				/>
 				{/* Custom Profession Suggestions Box */}
 				{professionSuggestions.length > 0 && (
@@ -212,6 +222,8 @@ const Signup = () => {
 					value={inputs.password}
 					size={"sm"}
 					onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
+					borderColor="gray.200"
+					_placeholder={{ color: "gray.400" }}
 				/>
 				<InputRightElement h='full'>
 					<Button variant={"ghost"} size={"sm"} onClick={() => setShowPassword(!showPassword)}>
