@@ -13,7 +13,7 @@ const Home = () => {
     };
 
     return (
-        <Tooltip hasArrow label={"Home"} placement="right" ml={1} openDelay={500}>
+        <Tooltip hasArrow label={"Home"} placement="right" ml={1} openDelay={500} display={{ base:"block", md:"none"}}>
             <Flex
                 alignItems={"center"}
                 gap={4}
