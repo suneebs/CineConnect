@@ -16,7 +16,7 @@ const useFetchMyJobs = () => {
       try {
         const q = query(
           collection(firestore, "jobs"),
-          where("postedBy", "==", authUser.uid)
+          where("userId", "==", authUser.uid) // ✅ Match the correct field
         );
         const querySnapshot = await getDocs(q);
         const jobsData = querySnapshot.docs.map((doc) => ({

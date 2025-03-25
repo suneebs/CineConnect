@@ -8,6 +8,7 @@ import {
   Tab,
   TabPanel,
   Flex,
+  Divider
 } from "@chakra-ui/react";
 import JobPosts from "../../components/Job/JobPosts";
 import MyJobOffers from "../../components/Job/MyJobOffers";
@@ -45,6 +46,7 @@ const JobPage = () => {
 
         <TabPanels>
           <TabPanel>
+          <Divider my={4} mt={4}/>
             <JobPosts jobs={filteredJobs} loading={loading} />
           </TabPanel>
           <TabPanel>

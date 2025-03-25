@@ -1,31 +1,22 @@
-import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { firestore } from "../firebase/firebase";
 
 const useApplyJob = () => {
-  const applyForJob = async (jobId, applicant) => {
-    try {
-      const jobRef = doc(firestore, "jobs", jobId);
-      const jobSnap = await getDoc(jobRef);
-      
-      if (jobSnap.exists()) {
-        const jobData = jobSnap.data();
-        const existingApplicants = jobData.applicants || [];
-        
-        if (existingApplicants.some(a => a.uid === applicant.uid)) {
-          console.warn("User has already applied for this job.");
-          return;
-        }
-
-        await updateDoc(jobRef, {
-          applicants: arrayUnion(applicant),
-        });
-      }
-    } catch (error) {
-      console.error("Error applying for job:", error);
-    }
+  const applyForJob = async (jobId, userId, updateState) => {
+    const jobRef = doc(firestore, "jobs", jobId);
+    await updateDoc(jobRef, { applicants: arrayUnion(userId) });
+    
+    if (updateState) updateState(); // ✅ Ensure UI updates after Firestore change
   };
 
-  return applyForJob;
+  const removeApplication = async (jobId, userId, updateState) => {
+    const jobRef = doc(firestore, "jobs", jobId);
+    await updateDoc(jobRef, { applicants: arrayRemove(userId) });
+  
+    if (updateState) updateState(); // ✅ Ensure UI updates after Firestore change
+  };
+  
+  return { applyForJob, removeApplication };
 };
 
 export default useApplyJob;
