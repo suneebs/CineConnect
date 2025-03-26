@@ -3,16 +3,52 @@ import { Box, Text, VStack, HStack, Spinner, Button, useDisclosure } from "@chak
 import { FaTrash, FaEdit, FaUsers } from "react-icons/fa";
 import JobModal from "../Modals/JobModal";
 import useFetchMyJobs from "../../hooks/useFetchMyJobs";
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase";
 import JobApplicantsModal from "../Modals/JobApplicantsModal";
+import useAuth  from "../../hooks/useAuth"; // Import useAuth to get userId
 
 const MyJobPosts = () => {
   const { myJobs, loading } = useFetchMyJobs();
   const [editingJob, setEditingJob] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedJob, setSelectedJob] = useState(null); // Track the job to view applicants
+  const { user } = useAuth(); // Get current user
 
+  // ✅ Handle creating a new job
+  const handleCreateJob = async (jobData) => {
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
+
+    try {
+      const newJob = {
+        ...jobData,
+        userId: user.uid, // ✅ Add userId to track who posted the job
+        createdAt: serverTimestamp(),
+      };
+
+      const docRef = await addDoc(collection(firestore, "jobs"), newJob);
+      console.log("Job created:", docRef.id);
+    } catch (error) {
+      console.error("Error creating job:", error);
+    }
+  };
+
+  // ✅ Handle updating an existing job
+  const handleEditJob = async (updatedJob) => {
+    if (!editingJob) return;
+
+    try {
+      await updateDoc(doc(firestore, "jobs", editingJob.id), updatedJob);
+      setEditingJob(null);
+    } catch (error) {
+      console.error("Error updating job:", error);
+    }
+  };
+
+  // ✅ Handle job deletion
   const handleDeleteJob = async (jobId) => {
     if (!window.confirm("Are you sure you want to delete this job post?")) return;
     try {
@@ -24,9 +60,14 @@ const MyJobPosts = () => {
 
   return (
     <Box>
-      {/* ✅ Job Modal */}
+      {/* ✅ Job Modal (For Creating & Editing) */}
       <Box mb={5} textAlign="right">
-        <JobModal onEdit={() => {}} editingJob={editingJob} setEditingJob={setEditingJob} />
+        <JobModal
+          onCreate={handleCreateJob} // ✅ Pass the function for new jobs
+          onEdit={handleEditJob} // ✅ Pass the function for editing jobs
+          editingJob={editingJob}
+          setEditingJob={setEditingJob}
+        />
       </Box>
 
       {loading ? (
@@ -55,12 +96,13 @@ const MyJobPosts = () => {
               {/* ✅ Actions */}
               <HStack justify="space-between" mt={3}>
                 <HStack>
-                  <Button leftIcon={<FaEdit />} 
+                  <Button
+                    leftIcon={<FaEdit />} 
                     colorScheme="blue"
                     size="sm" 
                     variant="solid"
-                    onClick={() => setEditingJob(job)} 
-                    >
+                    onClick={() => setEditingJob(job)} // ✅ Set job for editing
+                  >
                     Edit
                   </Button>
 
