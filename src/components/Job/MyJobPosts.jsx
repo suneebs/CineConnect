@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { Box, Text, VStack, HStack, IconButton, Spinner } from "@chakra-ui/react";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { Box, Text, VStack, HStack, Spinner, Button, useDisclosure } from "@chakra-ui/react";
+import { FaTrash, FaEdit, FaUsers } from "react-icons/fa";
 import JobModal from "../Modals/JobModal";
 import useFetchMyJobs from "../../hooks/useFetchMyJobs";
 import { deleteDoc, doc } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase";
-import { Button } from "@chakra-ui/react";
+import JobApplicantsModal from "../Modals/JobApplicantsModal";
 
 const MyJobPosts = () => {
   const { myJobs, loading } = useFetchMyJobs();
   const [editingJob, setEditingJob] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedJob, setSelectedJob] = useState(null); // Track the job to view applicants
 
   const handleDeleteJob = async (jobId) => {
     if (!window.confirm("Are you sure you want to delete this job post?")) return;
@@ -59,24 +61,42 @@ const MyJobPosts = () => {
                     variant="solid"
                     onClick={() => setEditingJob(job)} 
                     >
-                        Edit
+                    Edit
                   </Button>
 
                   <Button 
-                leftIcon={<FaTrash />} 
-                colorScheme="red" 
-                size="sm" 
-                variant="solid"
-                onClick={() => handleDeleteJob(job.id)}
-                >
-                Delete
-                </Button>
-                
+                    leftIcon={<FaTrash />} 
+                    colorScheme="red" 
+                    size="sm" 
+                    variant="solid"
+                    onClick={() => handleDeleteJob(job.id)}
+                  >
+                    Delete
+                  </Button>
+
+                  {/* ✅ Show Applicants Button */}
+                  <Button
+                    leftIcon={<FaUsers />}
+                    colorScheme="green"
+                    size="sm"
+                    variant="solid"
+                    onClick={() => {
+                      setSelectedJob(job);
+                      onOpen();
+                    }}
+                  >
+                    Show Applicants
+                  </Button>
                 </HStack>
               </HStack>
             </Box>
           ))}
         </VStack>
+      )}
+
+      {/* ✅ Job Applicants Modal */}
+      {selectedJob && (
+        <JobApplicantsModal isOpen={isOpen} onClose={onClose} jobId={selectedJob.id} jobTitle={selectedJob.title} />
       )}
     </Box>
   );
