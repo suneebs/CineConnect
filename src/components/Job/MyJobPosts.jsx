@@ -5,6 +5,7 @@ import JobModal from "../Modals/JobModal";
 import useFetchMyJobs from "../../hooks/useFetchMyJobs";
 import { deleteDoc, doc } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase";
+import { Button } from "@chakra-ui/react";
 
 const MyJobPosts = () => {
   const { myJobs, loading } = useFetchMyJobs();
@@ -52,8 +53,25 @@ const MyJobPosts = () => {
               {/* ✅ Actions */}
               <HStack justify="space-between" mt={3}>
                 <HStack>
-                  <IconButton icon={<FaEdit />} aria-label="Edit Job" size="sm" onClick={() => setEditingJob(job)} />
-                  <IconButton icon={<FaTrash />} aria-label="Delete Job" size="sm" colorScheme="red" onClick={() => handleDeleteJob(job.id)} />
+                  <Button leftIcon={<FaEdit />} 
+                    colorScheme="blue"
+                    size="sm" 
+                    variant="solid"
+                    onClick={() => setEditingJob(job)} 
+                    >
+                        Edit
+                  </Button>
+
+                  <Button 
+                leftIcon={<FaTrash />} 
+                colorScheme="red" 
+                size="sm" 
+                variant="solid"
+                onClick={() => handleDeleteJob(job.id)}
+                >
+                Delete
+                </Button>
+                
                 </HStack>
               </HStack>
             </Box>

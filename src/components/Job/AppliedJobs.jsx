@@ -1,9 +1,9 @@
-import { Box, Text, VStack, HStack, IconButton, Spinner } from "@chakra-ui/react";
-import { FaTrash } from "react-icons/fa";
+import { Box, Text, VStack, HStack, IconButton, Spinner, Flex } from "@chakra-ui/react";
+import { GrRevert } from "react-icons/gr";
 import useFetchAppliedJobs from "../../hooks/useFetchAppliedJobs";
 import useApplyJob from "../../hooks/useApplyJob";
 import { auth } from "../../firebase/firebase";
-
+import { Button } from "@chakra-ui/react";
 const AppliedJobs = () => {
   const { appliedJobs, loading } = useFetchAppliedJobs();
   const { removeApplication } = useApplyJob();
@@ -46,8 +46,17 @@ const AppliedJobs = () => {
 
               {/* ✅ Revert Application Button */}
               <HStack justify="flex-end" mt={3}>
-                <IconButton icon={<FaTrash />} aria-label="Revert Application" size="sm" colorScheme="red" onClick={() => handleRevertApplication(job.id)} />
-              </HStack>
+  <Button 
+    leftIcon={<GrRevert />} 
+    colorScheme="red" 
+    size="sm" 
+    variant="solid"
+    onClick={() => handleRevertApplication(job.id)}
+  >
+    Revert Application
+  </Button>
+</HStack>
+
             </Box>
           ))}
         </VStack>

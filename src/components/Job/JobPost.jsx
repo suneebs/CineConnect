@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore"; // ✅ Use onSnapshot for real-time updates
 import { 
   Box, Text, Flex, Avatar, Button, VStack, HStack, Divider, Badge, Spacer 
 } from "@chakra-ui/react";
@@ -8,7 +8,7 @@ import { firestore } from "../../firebase/firebase";
 import { getAuth } from "firebase/auth";
 import useApplyJob from "../../hooks/useApplyJob";
 
-const JobPost = ({ job, onJobUpdate }) => {
+const JobPost = ({ job }) => {
   const [user, setUser] = useState(null);
   const [applied, setApplied] = useState(false);
   const auth = getAuth();
@@ -17,35 +17,37 @@ const JobPost = ({ job, onJobUpdate }) => {
 
   // Fetch user details who posted the job
   useEffect(() => {
-    const fetchUser = async () => {
-      if (!job.userId) return;
-      try {
-        const userRef = doc(firestore, "users", job.userId);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          setUser(userSnap.data());
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+    if (!job.userId) return;
+    
+    const userRef = doc(firestore, "users", job.userId);
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setUser(snapshot.data());
       }
-    };
+    });
 
-    fetchUser();
+    return () => unsubscribe();
   }, [job.userId]);
 
-  // Check if the current user has applied for the job
+  // ✅ Real-time listener for job applicants
   useEffect(() => {
-    if (currentUser && job.applicants?.includes(currentUser.uid)) {
-      setApplied(true);
-    }
-  }, [job.applicants, currentUser]);
+    if (!currentUser) return;
+
+    const jobRef = doc(firestore, "jobs", job.id);
+    const unsubscribe = onSnapshot(jobRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const updatedJob = snapshot.data();
+        setApplied(updatedJob.applicants?.includes(currentUser.uid));
+      }
+    });
+
+    return () => unsubscribe();
+  }, [job.id, currentUser]);
 
   // Apply for Job
   const handleApply = async () => {
     if (!currentUser) return;
     await applyForJob(job.id, currentUser.uid);
-    setApplied(true);
-    if (onJobUpdate) onJobUpdate();
   };
 
   return (
@@ -74,12 +76,12 @@ const JobPost = ({ job, onJobUpdate }) => {
           </Text>
         </VStack>
         <Spacer />
-        <Badge colorScheme="purple" px={2} py={1} borderRadius="md">{job.category}</Badge>
+        <Badge colorScheme="purple">{job.category}</Badge>
       </Flex>
 
       <Divider borderColor="gray.600" />
 
-      <VStack align="start" spacing={3} flex="1" mt={3} fontSize="sm" color="gray.300">
+      <VStack align="start" spacing={3} mt={3} fontSize="sm" color="gray.300">
         <Text fontSize="lg" fontWeight="bold" color="white">{job.title}</Text>
         <HStack><Text fontWeight="medium" color="gray.400">📍 Location:</Text> <Text>{job.location}</Text></HStack>
         <HStack><Text fontWeight="medium" color="gray.400">👤 Gender:</Text> <Text>{job.gender}</Text></HStack>
