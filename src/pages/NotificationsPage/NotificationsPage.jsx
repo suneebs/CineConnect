@@ -21,6 +21,14 @@ const formatTime = (timestamp) => {
 // Categorize notifications based on time
 const categorizeNotifications = (notifications) => {
   const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset to midnight to avoid time issues
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const oneWeekAgo = new Date(today);
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const oneMonthAgo = new Date(today);
+  oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+
   const categories = {
     Today: [],
     Yesterday: [],
@@ -30,18 +38,27 @@ const categorizeNotifications = (notifications) => {
   };
 
   notifications.forEach((notif) => {
-    const notifDate = notif.timestamp?.toDate();
-    const diffDays = Math.floor((today - notifDate) / (1000 * 60 * 60 * 24));
+    if (!notif.timestamp) return; // Handle missing timestamps
 
-    if (diffDays === 0) categories.Today.push(notif);
-    else if (diffDays === 1) categories.Yesterday.push(notif);
-    else if (diffDays <= 7) categories["This Week"].push(notif);
-    else if (diffDays <= 30) categories["This Month"].push(notif);
-    else categories.Older.push(notif);
+    const notifDate = notif.timestamp.toDate();
+    notifDate.setHours(0, 0, 0, 0); // Reset to midnight
+
+    if (notifDate.getTime() === today.getTime()) {
+      categories.Today.push(notif);
+    } else if (notifDate.getTime() === yesterday.getTime()) {
+      categories.Yesterday.push(notif);
+    } else if (notifDate >= oneWeekAgo) {
+      categories["This Week"].push(notif);
+    } else if (notifDate >= oneMonthAgo) {
+      categories["This Month"].push(notif);
+    } else {
+      categories.Older.push(notif);
+    }
   });
 
   return categories;
 };
+
 
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -75,7 +92,7 @@ const NotificationsPage = () => {
   const categorizedNotifications = categorizeNotifications(notifications);
 
   return (
-    <Container maxW="container.sm" py={5}>
+    <Container maxW="container.sm" py={5} >
       <Box align="center" mb={5}>
         <Text fontSize="2xl" fontWeight="bold" textAlign="center">
           Notifications
@@ -95,13 +112,13 @@ const NotificationsPage = () => {
       )}
 
       {notifications.length === 0 ? (
-        <Text color="gray.500" textAlign="center">No new notifications yet.</Text>
+        <Text color="gray.400" textAlign="center">No new notifications yet.</Text>
       ) : (
         <VStack spacing={1} align="stretch">
           {Object.entries(categorizedNotifications).map(([category, notifs]) =>
             notifs.length > 0 && (
               <Box key={category}>
-                <Text fontSize="md" fontWeight="bold" color="gray.400" mb={2}>
+                <Text fontSize="md" fontWeight="bold" color="gray.300" mb={2}>
                   {category}
                 </Text>
                 <VStack spacing={1} align="stretch">
@@ -110,7 +127,9 @@ const NotificationsPage = () => {
                       key={notif.id}
                       p={2}
                       borderRadius="lg"
-                      bg="gray.900"
+                      bg="rgba(255, 255, 255, 0.05)"
+                      _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
+                      transition="0.2s ease-in-out"
                     >
                       <HStack spacing={2}>
                         <Avatar size="sm" src={notif.senderProfilePic || ""} />

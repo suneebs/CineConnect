@@ -3,15 +3,17 @@ import { useState } from "react";
 import Login from "./Login";
 import Signup from "./Signup";
 import GoogleAuth from "./GoogleAuth";
+import { CineConnectLogo } from "../../assets/constants";
 
 const AuthForm = () => {
 	const [isLogin, setIsLogin] = useState(true);
 
 	return (
 		<>
-			<Box border={"1px solid gray"} borderRadius={4} padding={5}>
+			<Box borderRadius={4} padding={5} minW={"96"}>
 				<VStack spacing={4}>
-					<Image src='/logo1.png' h={24} cursor={"pointer"} alt='Instagram' />
+					{/* <Image src='/logo1.png' h={24} cursor={"pointer"} alt='cineconnect' /> */}
+					<CineConnectLogo />
 
 					{isLogin ? <Login /> : <Signup />}
 
@@ -28,7 +30,7 @@ const AuthForm = () => {
 				</VStack>
 			</Box>
 
-			<Box border={"1px solid gray"} borderRadius={4} padding={5}>
+			<Box borderRadius={4} padding={5}>
 				<Flex alignItems={"center"} justifyContent={"center"}>
 					<Box mx={2} fontSize={14}>
 						{isLogin ? "Don't have an account?" : "Already have an account?"}

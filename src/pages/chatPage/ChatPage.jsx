@@ -112,7 +112,7 @@ const ChatPage = () => {
                         <ChatList chats={chats} setSelectedChat={setSelectedChat} selectedChat={selectedChat} />
                     </Box>
 
-                    <Box w="65%" bg="gray.900" display="flex" alignItems="center" justifyContent="center">
+                    <Box w="65%" display="flex" alignItems="center" justifyContent="center">
                         {selectedChat ? (
                             <ChatBox
                                 selectedChat={selectedChat}

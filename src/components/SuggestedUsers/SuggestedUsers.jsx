@@ -1,7 +1,8 @@
-import { Box, Flex, Link, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, Link, Text, textDecoration, VStack } from "@chakra-ui/react";
 import SuggestedHeader from "./SuggestedHeader";
 import SuggestedUser from "./SuggestedUser";
 import useGetSuggestedUsers from "../../hooks/useGetSuggestedUsers";
+import { Link as RouterLink } from "react-router-dom";
 
 const SuggestedUsers = () => {
 	const { isLoading, suggestedUsers } = useGetSuggestedUsers();
@@ -18,9 +19,11 @@ const SuggestedUsers = () => {
 					<Text fontSize={12} fontWeight={"bold"} color={"gray.500"}>
 						Suggested for you
 					</Text>
-					<Text fontSize={12} fontWeight={"bold"} _hover={{ color: "gray.400" }} cursor={"pointer"}>
+					<Link to={"/talents"} as={RouterLink} _hover={{textDecoration:"none"}} >
+					<Text fontSize={12} fontWeight={"bold"} color={"gray.500"} _hover={{ color: "white" }}>
 						See All
 					</Text>
+					</Link>
 				</Flex>
 			)}
 
