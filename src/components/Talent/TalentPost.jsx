@@ -1,4 +1,6 @@
-import { Box, Image, Text, VStack, HStack, Button, Flex, Icon } from "@chakra-ui/react";
+import { 
+  Box, Image, Text, VStack, HStack, Button, Flex, Icon, Badge 
+} from "@chakra-ui/react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import useFollowUser from "../../hooks/useFollowUser";
 import useAuthStore from "../../store/authStore";
@@ -10,8 +12,6 @@ const TalentPost = ({ talent, setTalents }) => {
 
   const onFollowUser = async () => {
     await handleFollowUser();
-
-    // ✅ Update state dynamically
     setTalents((prevTalents) =>
       prevTalents.map((t) =>
         t.uid === talent.uid
@@ -27,47 +27,91 @@ const TalentPost = ({ talent, setTalents }) => {
   };
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" w="full">
-      {/* Full-size Image */}
+    <Box
+      borderRadius="lg"
+      overflow="hidden"
+      w="full"
+      bg="rgba(255, 255, 255, 0.05)"  // Glassmorphism Effect
+      border="1px solid rgba(255, 255, 255, 0.2)"
+      boxShadow="0px 4px 10px rgba(0, 0, 0, 0.5)"
+      transition="all 0.3s ease-in-out"
+      _hover={{
+        transform: "scale(1.03)",
+        boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.6)",
+        borderColor: "rgba(255, 255, 255, 0.4)",
+      }}
+    >
+      {/* Profile Image */}
       <Link to={`/${talent.username}`}>
-      <Image src={talent.profilePicURL} alt={talent.username} objectFit="cover" w="100%" h="200px" />
+        <Image 
+          src={talent.profilePicURL} 
+          alt={talent.username} 
+          objectFit="cover" 
+          w="100%" 
+          h="240px" 
+          borderTopRadius="lg"
+          transition="0.3s"
+          _hover={{ filter: "brightness(1.2)" }}
+        />
       </Link>
-      
-      {/* Talent Info */}
-      <VStack spacing={3} p={4} align="start" w="100%">
-        {/* Username & Follow Button */}
+
+      {/* Talent Info Section */}
+      <VStack spacing={3} p={3} align="start" w="100%">
+        {/* Header: Name & Follow Button */}
         <Flex justify="space-between" align="center" w="100%">
           <Link to={`/${talent.username}`}>
-          <Text fontWeight="bold">{talent.username}</Text>
+            <Text fontWeight="bold" fontSize="lg" color="white">
+              {talent.username}
+            </Text>
           </Link>
-          {authUser?.uid !== talent.uid && ( // ✅ Hide button if it's the same user
+          {authUser?.uid !== talent.uid && (
             <Button
               size="sm"
-              colorScheme="blue"
-              borderRadius="md"
+              colorScheme={isFollowing ? "gray" : "blue"}
+              borderRadius="full"
+              px={5}
+              fontSize="sm"
+              fontWeight="medium"
+              isLoading={isUpdating}
+              _hover={{
+                transform: "scale(1.05)",
+                bg: isFollowing ? "gray.600" : "blue.500",
+              }}
               onClick={onFollowUser}
-              isLoading={isUpdating} // ✅ Disable button while updating
             >
               {isFollowing ? "Unfollow" : "Follow"}
             </Button>
           )}
         </Flex>
 
-        {/* Location with Professional Grey Icon */}
+        {/* Location Section */}
         <HStack>
-          <Icon as={FaMapMarkerAlt} color="gray.500" />
-          <Text fontSize="sm" color="gray.200">
+          <Icon as={FaMapMarkerAlt} color="cyan.300" />
+          <Text fontSize="sm" color="gray.300">
             {talent.location?.length > 0 ? talent.location : "Location not specified"}
           </Text>
         </HStack>
 
-        {/* Professions List */}
+        {/* Profession Badges with Neon Effect */}
         {Array.isArray(talent?.profession) && talent.profession.some((prof) => prof.trim() !== "") && (
-          <HStack flexWrap="wrap">
+          <HStack flexWrap="wrap" spacing={2}>
             {talent.profession.map((prof, index) => (
-              <Box key={index} bg="gray.700" color="white" borderRadius="md" fontSize="xs" px={2} py={1}>
+              <Badge
+                key={index}
+                bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)"
+                _hover={{
+                  boxShadow: "0px 0px 12px rgba(255, 255, 255, 0.3)",
+                }}
+              >
                 {prof}
-              </Box>
+              </Badge>
             ))}
           </HStack>
         )}

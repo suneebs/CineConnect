@@ -37,7 +37,7 @@ const Sidebar = () => {
 				>
 					<CineConnectMobileLogo />
 				</Link>
-				<Flex direction={"column"} gap={5} cursor={"pointer"}>
+				<Flex direction={"column"} gap={4} cursor={"pointer"}>
 					<SidebarItems />
 				</Flex>
 

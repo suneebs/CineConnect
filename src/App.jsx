@@ -9,6 +9,7 @@ import { auth } from "./firebase/firebase";
 import TalentPage from "./pages/TalentPage/TalentPage";
 import useUserProfileStore from "./hooks/useUserProfileStore";
 import ChatPage from "./pages/chatPage/ChatPage";
+import JobPage from "./pages/JobPage/JobPage";
 
 function App() {
 	const [authUser] = useAuthState(auth);
@@ -28,7 +29,7 @@ function App() {
 					<Route path='/auth' element={!authUser ? <AuthPage /> : <Navigate to='/' />} />
 					<Route path='/:username' element={<ProfilePage />} />
 					<Route path='/talents' element={<TalentPage />} />
-					{/* ✅ Fix: Add route for ChatPage */}
+					<Route path='/jobs' element={<JobPage />} />
 					<Route path='/messages' element={authUser ? <ChatPage /> : <Navigate to='/auth' />} />
 					<Route path='/chat/:chatId' element={authUser ? <ChatPage /> : <Navigate to='/auth' />} />
 				</Routes>
