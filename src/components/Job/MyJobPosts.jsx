@@ -12,8 +12,8 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { FaTrash, FaEdit, FaUsers } from "react-icons/fa";
-import JobModal from "../Modals/JobModal";
 import useFetchMyJobs from "../../hooks/useFetchMyJobs";
+import JobForm from "./JobForm"
 import {
   deleteDoc,
   doc,
@@ -33,6 +33,7 @@ const MyJobPosts = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedJob, setSelectedJob] = useState(null);
   const { user } = useAuth();
+  const [showForm, setShowForm] = useState(false); // ✅ Controls form visibility
 
   // ✅ Create Job
   const handleCreateJob = async (jobData) => {
@@ -50,6 +51,7 @@ const MyJobPosts = () => {
 
       const docRef = await addDoc(collection(firestore, "jobs"), newJob);
       console.log("Job created:", docRef.id);
+      setShowForm(false); // ✅ Close form after submission
     } catch (error) {
       console.error("Error creating job:", error);
     }
@@ -62,6 +64,7 @@ const MyJobPosts = () => {
     try {
       await updateDoc(doc(firestore, "jobs", editingJob.id), updatedJob);
       setEditingJob(null);
+      setShowForm(false); // ✅ Close form after updating
     } catch (error) {
       console.error("Error updating job:", error);
     }
@@ -79,9 +82,18 @@ const MyJobPosts = () => {
 
   return (
     <Box>
-      {/* ✅ Job Modal (Create/Edit) */}
+      {/* ✅ Show JobForm instead of JobModal */}
       <Flex justify="end" mb={5}>
-        <JobModal onCreate={handleCreateJob} onEdit={handleEditJob} editingJob={editingJob} setEditingJob={setEditingJob} />
+        {showForm ? (
+          <JobForm
+            onSubmit={editingJob ? handleEditJob : handleCreateJob}
+            editingJob={editingJob}
+          />
+        ) : (
+          <Button colorScheme="blue" onClick={() => setShowForm(true)}>
+            {editingJob ? "Edit Job" : "New Job"}
+          </Button>
+        )}
       </Flex>
 
       {loading ? (
@@ -152,7 +164,10 @@ const MyJobPosts = () => {
                     colorScheme="blue"
                     variant="solid"
                     size="sm"
-                    onClick={() => setEditingJob(job)}
+                    onClick={() => {
+                      setEditingJob(job);
+                      setShowForm(true);
+                    }}
                   >
                     Edit Post
                   </Button>
