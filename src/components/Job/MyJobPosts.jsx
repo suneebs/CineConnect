@@ -10,10 +10,11 @@ import {
   Divider,
   Badge,
   Flex,
+  Collapse,  // ✅ Import Collapse for smooth transitions
 } from "@chakra-ui/react";
 import { FaTrash, FaEdit, FaUsers } from "react-icons/fa";
 import useFetchMyJobs from "../../hooks/useFetchMyJobs";
-import JobForm from "./JobForm"
+import JobForm from "./JobForm";
 import {
   deleteDoc,
   doc,
@@ -25,7 +26,7 @@ import {
 import { firestore } from "../../firebase/firebase";
 import JobApplicantsModal from "../Modals/JobApplicantsModal";
 import useAuth from "../../hooks/useAuth";
-import { format } from "date-fns"; // ✅ For formatting dates
+import { format } from "date-fns";
 
 const MyJobPosts = () => {
   const { myJobs, loading } = useFetchMyJobs();
@@ -33,7 +34,7 @@ const MyJobPosts = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedJob, setSelectedJob] = useState(null);
   const { user } = useAuth();
-  const [showForm, setShowForm] = useState(false); // ✅ Controls form visibility
+  const { isOpen: isFormOpen, onToggle: toggleForm } = useDisclosure(); // ✅ Controls form visibility
 
   // ✅ Create Job
   const handleCreateJob = async (jobData) => {
@@ -51,7 +52,7 @@ const MyJobPosts = () => {
 
       const docRef = await addDoc(collection(firestore, "jobs"), newJob);
       console.log("Job created:", docRef.id);
-      setShowForm(false); // ✅ Close form after submission
+      toggleForm(); // ✅ Close form smoothly
     } catch (error) {
       console.error("Error creating job:", error);
     }
@@ -64,7 +65,7 @@ const MyJobPosts = () => {
     try {
       await updateDoc(doc(firestore, "jobs", editingJob.id), updatedJob);
       setEditingJob(null);
-      setShowForm(false); // ✅ Close form after updating
+      toggleForm(); // ✅ Close form smoothly
     } catch (error) {
       console.error("Error updating job:", error);
     }
@@ -82,19 +83,17 @@ const MyJobPosts = () => {
 
   return (
     <Box>
-      {/* ✅ Show JobForm instead of JobModal */}
+      {/* ✅ New Job Button */}
       <Flex justify="end" mb={5}>
-        {showForm ? (
-          <JobForm
-            onSubmit={editingJob ? handleEditJob : handleCreateJob}
-            editingJob={editingJob}
-          />
-        ) : (
-          <Button colorScheme="blue" onClick={() => setShowForm(true)}>
-            {editingJob ? "Edit Job" : "New Job"}
-          </Button>
-        )}
+        <Button colorScheme={isFormOpen ? "red" : "blue"} onClick={toggleForm}>
+          {isFormOpen ? "Cancel" : "New Job"}
+        </Button>
       </Flex>
+
+      {/* ✅ Smooth Transition for JobForm */}
+      <Collapse in={isFormOpen} animateOpacity>
+        <JobForm onSubmit={editingJob ? handleEditJob : handleCreateJob} editingJob={editingJob} />
+      </Collapse>
 
       {loading ? (
         <Flex justify="center" align="center" h="50vh">
@@ -105,8 +104,10 @@ const MyJobPosts = () => {
           You haven’t posted any jobs yet.
         </Text>
       ) : (
-        <VStack spacing={5} align="stretch">
-          {myJobs.map((job) => (
+        <VStack spacing={6} align="stretch">
+          {[...myJobs]
+            .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
+            .map((job) => (
             <Box
               key={job.id}
               p={6}
@@ -115,10 +116,9 @@ const MyJobPosts = () => {
               bg="gray.900"
               boxShadow="lg"
               transition="0.2s ease-in-out"
-              _hover={{ transform: "scale(1.02)", boxShadow: "xl" }}
               position="relative"
             >
-              {/* ✅ Posted Date (Top-Right) */}
+              {/* ✅ Posted Date */}
               {job.createdAt && (
                 <Text fontSize="sm" color="gray.400" position="absolute" top={3} right={4}>
                   Posted on {format(new Date(job.createdAt.seconds * 1000), "dd MMM yyyy")}
@@ -166,7 +166,7 @@ const MyJobPosts = () => {
                     size="sm"
                     onClick={() => {
                       setEditingJob(job);
-                      setShowForm(true);
+                      if (!isFormOpen) toggleForm();
                     }}
                   >
                     Edit Post

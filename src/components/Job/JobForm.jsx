@@ -11,6 +11,7 @@ import {
   ListItem,
   VStack,
   Divider,
+  Flex,
 } from "@chakra-ui/react";
 
 const jobRoles = ["Actor", "Director", "Editor", "Producer", "Cinematographer", "Screenwriter"];
@@ -61,25 +62,18 @@ const JobForm = ({ onSubmit, editingJob }) => {
   return (
     <Box
       p={6} // ✅ Same padding as MyJobPosts
-      borderWidth="1px"
-      borderRadius="lg"
-      bg="gray.900"
-      boxShadow="lg"
-      w="full" // ✅ Ensures width consistency
-      maxW="600px" // ✅ Exact same width as MyJobPosts
-      mx="auto"
-      transition="0.2s ease-in-out"
-      _hover={{ transform: "scale(1.02)", boxShadow: "xl" }}
+              borderWidth="1px"
+              borderRadius="lg"
+              bg="gray.900"
     >
       <VStack spacing={4} align="stretch">
+      <Grid templateColumns="repeat(2, 1fr)" gap={3}>
         <FormControl>
-          <FormLabel fontSize="sm">Job Title</FormLabel>
-          <Input name="title" value={job.title} onChange={handleChange} size="sm" />
+          <Input name="title" placeholder="Job Title" value={job.title} onChange={handleChange} size="sm" />
         </FormControl>
 
         <FormControl position="relative">
-          <FormLabel fontSize="sm">Role</FormLabel>
-          <Input name="category" value={job.category} onChange={handleCategoryChange} size="sm" />
+          <Input name="category" placeholder="Role" value={job.category} onChange={handleCategoryChange} size="sm" />
           {filteredRoles.length > 0 && (
             <Box
               position="absolute"
@@ -108,38 +102,31 @@ const JobForm = ({ onSubmit, editingJob }) => {
             </Box>
           )}
         </FormControl>
+        </Grid>
 
         <Grid templateColumns="repeat(2, 1fr)" gap={3}>
           <FormControl>
-            <FormLabel fontSize="sm">Gender</FormLabel>
-            <Input name="gender" value={job.gender} onChange={handleChange} size="sm" />
+            <Input name="gender" placeholder="Gender" value={job.gender} onChange={handleChange} size="sm" />
           </FormControl>
           <FormControl>
-            <FormLabel fontSize="sm">Age</FormLabel>
-            <Input name="age" value={job.age} onChange={handleChange} size="sm" />
+            <Input name="age" value={job.age} placeholder="Age" onChange={handleChange} size="sm" />
           </FormControl>
         </Grid>
 
         <Grid templateColumns="repeat(2, 1fr)" gap={3}>
           <FormControl>
-            <FormLabel fontSize="sm">Location</FormLabel>
-            <Input name="location" value={job.location} onChange={handleChange} size="sm" />
+            <Input name="location" placeholder="Location" value={job.location} onChange={handleChange} size="sm" />
           </FormControl>
           <FormControl>
-            <FormLabel fontSize="sm">Experience</FormLabel>
-            <Input name="experience" value={job.experience} onChange={handleChange} size="sm" />
+            <Input name="experience" placeholder="Experience" value={job.experience} onChange={handleChange} size="sm" />
           </FormControl>
         </Grid>
 
         <FormControl>
-          <FormLabel fontSize="sm">Description</FormLabel>
-          <Textarea name="description" value={job.description} onChange={handleChange} size="sm" rows={2} />
+          <Textarea name="description" placeholder="Description" value={job.description} onChange={handleChange} size="sm" rows={2} />
         </FormControl>
-
-        <Divider borderColor="gray.600" />
-
-        <Button w="full" colorScheme="blue" size="md" onClick={handleSubmit}>
-          {editingJob ? "Update Job" : "Post Job"}
+        <Button width={"auto"} colorScheme="blue" size="sm" alignSelf={'flex-end'} onClick={handleSubmit}>
+          {editingJob ? "Update" : "Post"}
         </Button>
       </VStack>
     </Box>

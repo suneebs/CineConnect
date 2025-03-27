@@ -16,7 +16,9 @@ const JobPosts = () => {
       spacing={1} 
       w="full"
     >
-      {jobs.map((job) => <JobPost key={job.id} job={job} />)}
+      {[...jobs]
+        .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds) // ✅ Sort by newest first
+        .map((job) => <JobPost key={job.id} job={job} />)}
     </SimpleGrid>
   );
 };
