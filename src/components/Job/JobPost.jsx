@@ -1,9 +1,20 @@
 import { useState, useEffect } from "react";
-import { doc, onSnapshot } from "firebase/firestore"; // ✅ Use onSnapshot for real-time updates
-import { 
-  Box, Text, Flex, Avatar, Button, VStack, HStack, Divider, Badge, Spacer 
+import { doc, onSnapshot } from "firebase/firestore";
+import {
+  Box,
+  Text,
+  Flex,
+  Avatar,
+  Button,
+  VStack,
+  HStack,
+  Divider,
+  Badge,
+  Spacer,
+  Icon,
 } from "@chakra-ui/react";
 import { formatDistanceToNow } from "date-fns";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { firestore } from "../../firebase/firebase";
 import { getAuth } from "firebase/auth";
 import useApplyJob from "../../hooks/useApplyJob";
@@ -15,21 +26,19 @@ const JobPost = ({ job }) => {
   const currentUser = auth.currentUser;
   const { applyForJob } = useApplyJob();
 
-  // Fetch user details who posted the job
+  // Fetch job poster details
   useEffect(() => {
     if (!job.userId) return;
-    
+
     const userRef = doc(firestore, "users", job.userId);
     const unsubscribe = onSnapshot(userRef, (snapshot) => {
-      if (snapshot.exists()) {
-        setUser(snapshot.data());
-      }
+      if (snapshot.exists()) setUser(snapshot.data());
     });
 
     return () => unsubscribe();
   }, [job.userId]);
 
-  // ✅ Real-time listener for job applicants
+  // Track applied status in real-time
   useEffect(() => {
     if (!currentUser) return;
 
@@ -51,52 +60,86 @@ const JobPost = ({ job }) => {
   };
 
   return (
-    <Box 
-      p={5} 
-      borderRadius="lg" 
-      boxShadow="lg"
-      bg="rgba(25, 25, 25, 0.95)"
-      bgGradient="linear(to-b, rgba(30,30,30,0.92), rgba(15,15,15,0.88))"
-      border="1px solid rgba(255,255,255,0.1)"
-      transition="0.2s ease-in-out"
-      _hover={{ 
-        boxShadow: "xl", 
-        transform: "scale(1.02)", 
-        bgGradient: "linear(to-b, rgba(35,35,35,0.95), rgba(20,20,20,0.9))"
-      }}
-      display="flex"
-      flexDirection="column"
+    <Box
+      borderRadius="lg"
+      bg="rgba(255, 255, 255, 0.05)" // Glassmorphism
+      border="1px solid rgba(255, 255, 255, 0.2)"
+      boxShadow="0px 4px 10px rgba(0, 0, 0, 0.5)"
+      transition="all 0.3s ease-in-out"
+      
+      p={4}
     >
+      {/* Job Poster Info */}
       <Flex align="center" mb={3}>
         <Avatar size="md" name={user?.username} src={user?.profilePicURL || ""} />
         <VStack align="start" spacing={0} ml={3}>
-          <Text fontSize="sm" fontWeight="bold" color="white">{user?.username || "Unknown User"}</Text>
+          <Text fontSize="sm" fontWeight="bold" color="white">
+            {user?.username || "Unknown User"}
+          </Text>
           <Text fontSize="xs" color="gray.400">
             {job.createdAt ? formatDistanceToNow(job.createdAt.toDate(), { addSuffix: true }) : "Just now"}
           </Text>
         </VStack>
         <Spacer />
-        <Badge colorScheme="purple">{job.category}</Badge>
+        <Badge 
+                bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)"
+                >
+                  {job.category}
+                </Badge>
       </Flex>
 
       <Divider borderColor="gray.600" />
 
+      {/* Job Details */}
       <VStack align="start" spacing={3} mt={3} fontSize="sm" color="gray.300">
-        <Text fontSize="lg" fontWeight="bold" color="white">{job.title}</Text>
-        <HStack><Text fontWeight="medium" color="gray.400">📍 Location:</Text> <Text>{job.location}</Text></HStack>
-        <HStack><Text fontWeight="medium" color="gray.400">👤 Gender:</Text> <Text>{job.gender}</Text></HStack>
-        <HStack><Text fontWeight="medium" color="gray.400">📅 Age Range:</Text> <Text>{job.age}</Text></HStack>
-        <HStack><Text fontWeight="medium" color="gray.400">💼 Experience:</Text> <Text>{job.experience || "Not mentioned"}</Text></HStack>
-        <HStack><Text fontWeight="medium" color="gray.400">📌 Description:</Text> <Text noOfLines={2}>{job.description}</Text></HStack>
+        <Text fontSize="lg" fontWeight="bold" color="white">
+          {job.title}
+        </Text>
+        <HStack>
+          <Icon as={FaMapMarkerAlt} color="cyan.300" />
+          <Text>{job.location || "Location not specified"}</Text>
+        </HStack>
+        <HStack>
+          <Text fontWeight="medium" color="gray.400">
+            Gender:
+          </Text>
+          <Text>{job.gender || "Not mentioned"}</Text>
+        </HStack>
+        <HStack>
+          <Text fontWeight="medium" color="gray.400">
+            Age:
+          </Text>
+          <Text>{job.age || "Not mentioned"}</Text>
+        </HStack>
+        <HStack>
+          <Text fontWeight="medium" color="gray.400">
+            Experience:
+          </Text>
+          <Text>{job.experience || "Not mentioned"}</Text>
+        </HStack>
+        <Text fontWeight="medium" color="gray.400">
+          Description:
+        </Text>
+        <Text>{job.description}</Text>
       </VStack>
 
+      {/* Apply Button */}
       <Flex mt={4} justify="center">
-        <Button 
-          colorScheme={applied ? "gray" : "blue"} 
-          size="sm" 
-          borderRadius="full" 
-          onClick={handleApply} 
+        <Button
+          colorScheme={applied ? "gray" : "blue"}
+          size="sm"
+          borderRadius="full"
+          onClick={handleApply}
           isDisabled={applied}
+          transition="0.2s"
+          _hover={{ transform: "scale(1.05)" }}
         >
           {applied ? "Applied" : "Apply Now"}
         </Button>

@@ -10,7 +10,8 @@ import {
   Divider,
   Badge,
   Flex,
-  Collapse,  // ✅ Import Collapse for smooth transitions
+  Collapse,
+  Icon,
 } from "@chakra-ui/react";
 import { FaTrash, FaEdit, FaUsers } from "react-icons/fa";
 import useFetchMyJobs from "../../hooks/useFetchMyJobs";
@@ -34,7 +35,7 @@ const MyJobPosts = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedJob, setSelectedJob] = useState(null);
   const { user } = useAuth();
-  const { isOpen: isFormOpen, onToggle: toggleForm } = useDisclosure(); // ✅ Controls form visibility
+  const { isOpen: isFormOpen, onToggle: toggleForm } = useDisclosure();
 
   // ✅ Create Job
   const handleCreateJob = async (jobData) => {
@@ -65,7 +66,7 @@ const MyJobPosts = () => {
     try {
       await updateDoc(doc(firestore, "jobs", editingJob.id), updatedJob);
       setEditingJob(null);
-      toggleForm(); // ✅ Close form smoothly
+      toggleForm();
     } catch (error) {
       console.error("Error updating job:", error);
     }
@@ -104,98 +105,135 @@ const MyJobPosts = () => {
           You haven’t posted any jobs yet.
         </Text>
       ) : (
-        <VStack spacing={6} align="stretch">
+        <VStack spacing={1} align="stretch">
           {[...myJobs]
             .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
             .map((job) => (
-            <Box
-              key={job.id}
-              p={6}
-              borderWidth="1px"
-              borderRadius="lg"
-              bg="gray.900"
-              boxShadow="lg"
-              transition="0.2s ease-in-out"
-              position="relative"
-            >
-              {/* ✅ Posted Date */}
-              {job.createdAt && (
-                <Text fontSize="sm" color="gray.400" position="absolute" top={3} right={4}>
-                  Posted on {format(new Date(job.createdAt.seconds * 1000), "dd MMM yyyy")}
-                </Text>
-              )}
-
-              {/* ✅ Job Title */}
-              <Text fontSize="xl" fontWeight="bold" color="white">
-                {job.title}
-              </Text>
-
-              <Text fontSize="md" color="gray.400" mt={1}>
-                {job.description}
-              </Text>
-
-              <Divider my={4} borderColor="gray.600" />
-
-              {/* ✅ Job Details */}
-              <HStack spacing={4} wrap="wrap" mb={4}>
-                <Badge colorScheme="blue" px={3} py={1} fontSize="sm" borderRadius="md">
-                  {job.category}
-                </Badge>
-                <Badge colorScheme="purple" px={3} py={1} fontSize="sm" borderRadius="md">
-                  {job.gender || "Any Gender"}
-                </Badge>
-                <Badge colorScheme="green" px={3} py={1} fontSize="sm" borderRadius="md">
-                  {job.age || "Any Age"}
-                </Badge>
-                <Badge colorScheme="orange" px={3} py={1} fontSize="sm" borderRadius="md">
-                  {job.location}
-                </Badge>
-                {job.experience && (
-                  <Badge colorScheme="teal" px={3} py={1} fontSize="sm" borderRadius="md">
-                    {job.experience}
-                  </Badge>
+              <Box
+                key={job.id}
+                p={4}
+                borderRadius="lg"
+                bg="rgba(255, 255, 255, 0.1)" // ✅ Glassmorphic effect
+                boxShadow="lg"
+                position="relative"
+                
+              >
+                {/* ✅ Posted Date */}
+                {job.createdAt && (
+                  <Text fontSize="sm" color="gray.400" position="absolute" top={3} right={4}>
+                    Posted on {format(new Date(job.createdAt.seconds * 1000), "dd MMM yyyy")}
+                  </Text>
                 )}
-              </HStack>
 
-              {/* ✅ Action Buttons */}
-              <HStack spacing={3} justify="space-between">
-                <HStack spacing={3}>
-                  <Button
-                    colorScheme="blue"
-                    variant="solid"
-                    size="sm"
-                    onClick={() => {
-                      setEditingJob(job);
-                      if (!isFormOpen) toggleForm();
-                    }}
-                  >
-                    Edit Post
-                  </Button>
+                {/* ✅ Job Title */}
+                <Text fontSize="xl" fontWeight="bold" color="white">
+                  {job.title}
+                </Text>
 
-                  <Button
-                    colorScheme="red"
-                    variant="solid"
-                    size="sm"
-                    onClick={() => handleDeleteJob(job.id)}
-                  >
-                    Delete Post
-                  </Button>
+                <Text fontSize="md" color="gray.300" mt={1}>
+                  {job.description}
+                </Text>
+
+                <Divider my={2} borderColor="gray.600" />
+
+                {/* ✅ Job Details */}
+                <HStack spacing={2} wrap="wrap" mb={3}>
+                  <Badge bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                    {job.category}
+                  </Badge>
+                  <Badge bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                    {job.gender || "Not mentioned"}
+                  </Badge>
+                  <Badge bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                    {job.age || "Not mentioned"}
+                  </Badge>
+                  <Badge bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                    {job.location}
+                  </Badge>
+                  {job.experience && (
+                    <Badge bg="rgba(255, 255, 255, 0.1)"
+                    color="white"
+                    borderRadius="full"
+                    px={3}
+                    py={1}
+                    fontSize="xs"
+                    border="1px solid rgba(255, 255, 255, 0.2)"
+                    boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                      {job.experience}
+                    </Badge>
+                  )}
                 </HStack>
 
-                <Button
-                  colorScheme="green"
-                  variant="solid"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedJob(job);
-                    onOpen();
-                  }}
-                >
-                  Show Applicants
-                </Button>
-              </HStack>
-            </Box>
-          ))}
+                {/* ✅ Action Buttons */}
+                <HStack spacing={3} justify="space-between">
+                  <HStack spacing={3}>
+                    <Button
+                      colorScheme="blue"
+                      variant="outline"
+                      size="sm"
+                      leftIcon={<Icon as={FaEdit} />}
+                      onClick={() => {
+                        setEditingJob(job);
+                        if (!isFormOpen) toggleForm();
+                      }}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      colorScheme="red"
+                      variant="outline"
+                      size="sm"
+                      leftIcon={<Icon as={FaTrash} />}
+                      onClick={() => handleDeleteJob(job.id)}
+                    >
+                      Delete
+                    </Button>
+                  </HStack>
+
+                  <Button
+                    colorScheme="green"
+                    variant="solid"
+                    size="sm"
+                    leftIcon={<Icon as={FaUsers} />}
+                    onClick={() => {
+                      setSelectedJob(job);
+                      onOpen();
+                    }}
+                  >
+                    View Applicants
+                  </Button>
+                </HStack>
+              </Box>
+            ))}
         </VStack>
       )}
 
