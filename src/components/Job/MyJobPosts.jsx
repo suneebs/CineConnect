@@ -29,7 +29,7 @@ import JobApplicantsModal from "../Modals/JobApplicantsModal";
 import useAuth from "../../hooks/useAuth";
 import { format } from "date-fns";
 
-const MyJobPosts = () => {
+const MyJobPosts = ({ searchTerm = "" }) => {
   const { myJobs, loading } = useFetchMyJobs();
   const [editingJob, setEditingJob] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -106,9 +106,19 @@ const MyJobPosts = () => {
         </Text>
       ) : (
         <VStack spacing={1} align="stretch">
-          {[...myJobs]
-            .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
-            .map((job) => (
+          {
+          [...myJobs]
+  .filter((job) =>
+    searchTerm
+      ? (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.category && job.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.role && job.role.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.description && job.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      : true
+  )
+  .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
+  .map((job) => (
               <Box
                 key={job.id}
                 p={4}

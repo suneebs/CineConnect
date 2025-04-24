@@ -16,7 +16,7 @@ import useApplyJob from "../../hooks/useApplyJob";
 import { auth } from "../../firebase/firebase";
 import { format } from "date-fns";
 
-const AppliedJobs = () => {
+const AppliedJobs = ({ searchTerm = "" }) => {
   const { appliedJobs, loading } = useFetchAppliedJobs();
   const { removeApplication } = useApplyJob();
 
@@ -43,7 +43,18 @@ const AppliedJobs = () => {
         </Text>
       ) : (
         <VStack spacing={1} align="stretch">
-          {appliedJobs.map((job) => (
+          {appliedJobs
+  .filter((job) =>
+    searchTerm
+      ? (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.category && job.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.role && job.role.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.description && job.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      : true
+  )
+  .map((job) => (
+
             <Box
               key={job.id}
               p={4}
