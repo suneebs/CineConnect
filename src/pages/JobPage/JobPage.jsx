@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Box,
   Input,
@@ -18,25 +18,33 @@ const JobPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { jobs, loading } = useFetchJobs();
 
-  const filteredJobs = jobs.filter((job) =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredJobs = useMemo(() => {
+    if (!searchTerm.trim()) return jobs;
+    
+    const term = searchTerm.toLowerCase();
+    return jobs.filter((job) => 
+      (job.title && job.title.toLowerCase().includes(term)) ||
+      (job.category && job.category.toLowerCase().includes(term)) ||
+      (job.location && job.location.toLowerCase().includes(term)) ||
+      (job.role && job.role.toLowerCase().includes(term)) ||
+      (job.description && job.description.toLowerCase().includes(term))
+    );
+  }, [jobs, searchTerm]);
 
   return (
     <Box px={6} py={4} w="full" mt={4}>
-      {/* Dynamic Search Bar */}
       <Input
-        placeholder="Search for Opportunities..."
+        placeholder="Search by title, company, location, or role..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         size="lg"
         borderRadius="md"
         bg="rgba(255, 255, 255, 0.05)"
         _focus={{ bg: "rgba(255, 255, 255, 0.1)" }}
+        mb={4}
       />
 
-      {/* Tabs for Job Listings */}
-      <Tabs variant="soft-rounded" colorScheme="blue" mt={4}>
+      <Tabs variant="soft-rounded" colorScheme="blue">
         <TabList>
           <Flex>
             <Tab _selected={{ bg: "blue.500", color: "white" }}>Ongoing Jobs</Tab>
@@ -46,11 +54,11 @@ const JobPage = () => {
 
         <TabPanels>
           <TabPanel>
-          <Divider my={4} mt={4}/>
-            <JobPosts jobs={filteredJobs} loading={loading} />
+            <Divider my={4} />
+            <JobPosts jobs={filteredJobs} loading={loading} searchTerm={searchTerm} />
           </TabPanel>
           <TabPanel>
-            <MyJobOffers />
+            <MyJobOffers searchTerm={searchTerm} />
           </TabPanel>
         </TabPanels>
       </Tabs>
