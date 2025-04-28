@@ -1,38 +1,28 @@
 import { useState, useEffect } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { firestore } from "../firebase/firebase";
-import useAuthStore from "../store/authStore";
+import useAuth from "./useAuth"; // Import useAuth to get user
 
 const useFetchMyJobs = () => {
+  const { user } = useAuth(); // Get logged-in user
   const [myJobs, setMyJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const authUser = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    if (!authUser) return;
+    if (!user) return;
 
-    const fetchMyJobs = async () => {
-      setLoading(true);
-      try {
-        const q = query(
-          collection(firestore, "jobs"),
-          where("userId", "==", authUser.uid) // ✅ Match the correct field
-        );
-        const querySnapshot = await getDocs(q);
-        const jobsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setMyJobs(jobsData);
-      } catch (error) {
-        console.error("Error fetching user jobs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const jobsRef = collection(firestore, "jobs");
+    const q = query(jobsRef, where("userId", "==", user.uid));
 
-    fetchMyJobs();
-  }, [authUser]);
+    // ✅ Real-time listener for job updates
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const jobs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setMyJobs(jobs);
+      setLoading(false);
+    });
+
+    return () => unsubscribe(); // Cleanup listener
+  }, [user]);
 
   return { myJobs, loading };
 };

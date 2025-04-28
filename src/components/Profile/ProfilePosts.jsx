@@ -41,7 +41,7 @@ export default ProfilePosts;
 
 const NoPostsFound = () => {
 	return (
-		<Flex flexDir='column' textAlign={"center"} mx={"auto"} mt={10}>
+		<Flex flexDir='column' textAlign={"center"} mx={"auto"} mt={10} minH={"30vh"}>
 			<Text fontSize={"2xl"}>No Posts Yet</Text>
 		</Flex>
 	);

@@ -2,7 +2,7 @@ import { Box, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import MyJobPosts from "./MyJobPosts";
 import AppliedJobs from "./AppliedJobs";
 
-const MyJobOffers = () => {
+const MyJobOffers = ({ searchTerm }) => {
   return (
     <Box w="full" maxW="900px" mx="auto">
       <Tabs variant="unstyled">
@@ -17,10 +17,10 @@ const MyJobOffers = () => {
 
         <TabPanels>
           <TabPanel px={0}>
-            <MyJobPosts />
+            <MyJobPosts searchTerm={searchTerm} />
           </TabPanel>
           <TabPanel px={0}>
-            <AppliedJobs />
+            <AppliedJobs searchTerm={searchTerm} />
           </TabPanel>
         </TabPanels>
       </Tabs>

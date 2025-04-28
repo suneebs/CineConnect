@@ -1,16 +1,78 @@
 import { useState } from "react";
-import { Box, Text, VStack, HStack, IconButton, Spinner } from "@chakra-ui/react";
-import { FaTrash, FaEdit } from "react-icons/fa";
-import JobModal from "../Modals/JobModal";
+import {
+  Box,
+  Text,
+  VStack,
+  HStack,
+  Spinner,
+  Button,
+  useDisclosure,
+  Divider,
+  Badge,
+  Flex,
+  Collapse,
+  Icon,
+} from "@chakra-ui/react";
+import { FaTrash, FaEdit, FaUsers } from "react-icons/fa";
 import useFetchMyJobs from "../../hooks/useFetchMyJobs";
-import { deleteDoc, doc } from "firebase/firestore";
+import JobForm from "./JobForm";
+import {
+  deleteDoc,
+  doc,
+  updateDoc,
+  collection,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { firestore } from "../../firebase/firebase";
-import { Button } from "@chakra-ui/react";
+import JobApplicantsModal from "../Modals/JobApplicantsModal";
+import useAuth from "../../hooks/useAuth";
+import { format } from "date-fns";
 
-const MyJobPosts = () => {
+const MyJobPosts = ({ searchTerm = "" }) => {
   const { myJobs, loading } = useFetchMyJobs();
   const [editingJob, setEditingJob] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedJob, setSelectedJob] = useState(null);
+  const { user } = useAuth();
+  const { isOpen: isFormOpen, onToggle: toggleForm } = useDisclosure();
 
+  // ✅ Create Job
+  const handleCreateJob = async (jobData) => {
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
+
+    try {
+      const newJob = {
+        ...jobData,
+        userId: user.uid,
+        createdAt: serverTimestamp(),
+      };
+
+      const docRef = await addDoc(collection(firestore, "jobs"), newJob);
+      console.log("Job created:", docRef.id);
+      toggleForm(); // ✅ Close form smoothly
+    } catch (error) {
+      console.error("Error creating job:", error);
+    }
+  };
+
+  // ✅ Edit Job
+  const handleEditJob = async (updatedJob) => {
+    if (!editingJob) return;
+
+    try {
+      await updateDoc(doc(firestore, "jobs", editingJob.id), updatedJob);
+      setEditingJob(null);
+      toggleForm();
+    } catch (error) {
+      console.error("Error updating job:", error);
+    }
+  };
+
+  // ✅ Delete Job
   const handleDeleteJob = async (jobId) => {
     if (!window.confirm("Are you sure you want to delete this job post?")) return;
     try {
@@ -22,61 +84,177 @@ const MyJobPosts = () => {
 
   return (
     <Box>
-      {/* ✅ Job Modal */}
-      <Box mb={5} textAlign="right">
-        <JobModal onEdit={() => {}} editingJob={editingJob} setEditingJob={setEditingJob} />
-      </Box>
+      {/* ✅ New Job Button */}
+      <Flex justify="end" mb={5}>
+        <Button colorScheme={isFormOpen ? "red" : "blue"} onClick={toggleForm}>
+          {isFormOpen ? "Cancel" : "New Job"}
+        </Button>
+      </Flex>
+
+      {/* ✅ Smooth Transition for JobForm */}
+      <Collapse in={isFormOpen} animateOpacity>
+        <JobForm onSubmit={editingJob ? handleEditJob : handleCreateJob} editingJob={editingJob} />
+      </Collapse>
 
       {loading ? (
-        <Spinner size="lg" color="blue.400" />
+        <Flex justify="center" align="center" h="50vh">
+          <Spinner size="lg" color="blue.400" />
+        </Flex>
       ) : myJobs.length === 0 ? (
         <Text fontSize="lg" color="gray.500" textAlign="center">
           You haven’t posted any jobs yet.
         </Text>
       ) : (
-        <VStack spacing={4} align="stretch">
-          {myJobs.map((job) => (
-            <Box
-              key={job.id}
-              p={4}
-              borderWidth="1px"
-              borderRadius="lg"
-              bg="gray.800"
-              transition="0.2s ease-in-out"
-              _hover={{ boxShadow: "lg", transform: "scale(1.02)" }}
-            >
-              <Text fontSize="lg" fontWeight="bold" color="white">
-                {job.title}
-              </Text>
-              <Text fontSize="sm" color="gray.400">{job.description}</Text>
-
-              {/* ✅ Actions */}
-              <HStack justify="space-between" mt={3}>
-                <HStack>
-                  <Button leftIcon={<FaEdit />} 
-                    colorScheme="blue"
-                    size="sm" 
-                    variant="solid"
-                    onClick={() => setEditingJob(job)} 
-                    >
-                        Edit
-                  </Button>
-
-                  <Button 
-                leftIcon={<FaTrash />} 
-                colorScheme="red" 
-                size="sm" 
-                variant="solid"
-                onClick={() => handleDeleteJob(job.id)}
-                >
-                Delete
-                </Button>
+        <VStack spacing={1} align="stretch">
+          {
+          [...myJobs]
+  .filter((job) =>
+    searchTerm
+      ? (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.category && job.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.role && job.role.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.description && job.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      : true
+  )
+  .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
+  .map((job) => (
+              <Box
+                key={job.id}
+                p={4}
+                borderRadius="lg"
+                bg="rgba(255, 255, 255, 0.1)" // ✅ Glassmorphic effect
+                boxShadow="lg"
+                position="relative"
                 
+              >
+                {/* ✅ Posted Date */}
+                {job.createdAt && (
+                  <Text fontSize="sm" color="gray.400" position="absolute" top={3} right={4}>
+                    Posted on {format(new Date(job.createdAt.seconds * 1000), "dd MMM yyyy")}
+                  </Text>
+                )}
+
+                {/* ✅ Job Title */}
+                <Text fontSize="xl" fontWeight="bold" color="white">
+                  {job.title}
+                </Text>
+
+                <Text fontSize="md" color="gray.300" mt={1}>
+                  {job.description}
+                </Text>
+
+                <Divider my={2} borderColor="gray.600" />
+
+                {/* ✅ Job Details */}
+                <HStack spacing={2} wrap="wrap" mb={3}>
+                  <Badge bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                    {job.category}
+                  </Badge>
+                  <Badge bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                    {job.gender || "Not mentioned"}
+                  </Badge>
+                  <Badge bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                    {job.age || "Not mentioned"}
+                  </Badge>
+                  <Badge bg="rgba(255, 255, 255, 0.1)"
+                color="white"
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                    {job.location}
+                  </Badge>
+                  {job.experience && (
+                    <Badge bg="rgba(255, 255, 255, 0.1)"
+                    color="white"
+                    borderRadius="full"
+                    px={3}
+                    py={1}
+                    fontSize="xs"
+                    border="1px solid rgba(255, 255, 255, 0.2)"
+                    boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
+                      {job.experience}
+                    </Badge>
+                  )}
                 </HStack>
-              </HStack>
-            </Box>
-          ))}
+
+                {/* ✅ Action Buttons */}
+                <HStack spacing={3} justify="space-between">
+                  <HStack spacing={3}>
+                    <Button
+                      colorScheme="blue"
+                      variant="outline"
+                      size="sm"
+                      leftIcon={<Icon as={FaEdit} />}
+                      onClick={() => {
+                        setEditingJob(job);
+                        if (!isFormOpen) toggleForm();
+                      }}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      colorScheme="red"
+                      variant="outline"
+                      size="sm"
+                      leftIcon={<Icon as={FaTrash} />}
+                      onClick={() => handleDeleteJob(job.id)}
+                    >
+                      Delete
+                    </Button>
+                  </HStack>
+
+                  <Button
+                    colorScheme="green"
+                    variant="solid"
+                    size="sm"
+                    leftIcon={<Icon as={FaUsers} />}
+                    onClick={() => {
+                      setSelectedJob(job);
+                      onOpen();
+                    }}
+                  >
+                    View Applicants
+                  </Button>
+                </HStack>
+              </Box>
+            ))}
         </VStack>
+      )}
+
+      {/* ✅ Job Applicants Modal */}
+      {selectedJob && (
+        <JobApplicantsModal
+          isOpen={isOpen}
+          onClose={onClose}
+          jobId={selectedJob.id}
+          jobTitle={selectedJob.title}
+        />
       )}
     </Box>
   );
