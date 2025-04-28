@@ -18,7 +18,7 @@ const MobileHeader = () => {
   return (
     <Flex
       w="full"
-      px={4}
+      px={3}
       py={3}
       align="center"
       justify="space-between"

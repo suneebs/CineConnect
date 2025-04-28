@@ -6,7 +6,8 @@ import useUserProfileStore from "../../store/userProfileStore";
 import useAuthStore from "../../store/authStore";
 import EditProfile from "./EditProfile";
 import useFollowUser from "../../hooks/useFollowUser";
-import { IoLocationOutline } from "react-icons/io5";
+import { FaMapMarkerAlt } from "react-icons/fa";
+
 
 const ProfileHeader = () => {
   const { userProfile } = useUserProfileStore();
@@ -140,7 +141,7 @@ const ProfileHeader = () => {
 
         <Flex fontSize={"sm"} alignItems={"center"} gap={1}>
           {userProfile.location?
-          <IoLocationOutline /> : ""
+          <FaMapMarkerAlt /> : ""
           }
           {/* {userProfile.location || "Not specified"} */}
           {userProfile.location}
