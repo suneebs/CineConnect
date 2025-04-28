@@ -1,31 +1,46 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Image } from "@chakra-ui/react";
+import { useLocation, useNavigate } from "react-router-dom";
+import useUserProfileStore from "../../store/userProfileStore";
 import ProfileLink from "../Sidebar/ProfileLink";
 import Notifications from "../Sidebar/Notifications";
 import Search from "../Sidebar/Search";
 import { CineConnectLogo } from "../../assets/constants";
 
 const MobileHeader = () => {
-	return (
-		<Flex
-			w="full"
-			px={4}
-			py={3}
-			align="center"
-			justify="space-between"
-		>
-			{/* Left Side: Profile + Logo */}
-			<Flex align="center" gap={0}>
-				<ProfileLink />
-				
-			</Flex>
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { userProfile } = useUserProfileStore();
 
-			{/* Right Side: Search + Notifications */}
-			<Flex align="center" gap={4}>
-				<Search />
-				<Notifications />
-			</Flex>
-		</Flex>
-	);
+  const isOwnProfilePage = userProfile?.username 
+    ? location.pathname === `/${userProfile.username}`
+    : false;
+
+  return (
+    <Flex
+      w="full"
+      px={4}
+      py={3}
+      align="center"
+      justify="space-between"
+    >
+      {/* Left Side */}
+      <Flex align="center" gap={0}>
+        {isOwnProfilePage ? (
+            <Flex w={"120px"}>
+                <CineConnectLogo />
+            </Flex>
+        ) : (
+          <ProfileLink />
+        )}
+      </Flex>
+
+      {/* Right Side */}
+      <Flex align="center" gap={4}>
+        <Search />
+        <Notifications />
+      </Flex>
+    </Flex>
+  );
 };
 
 export default MobileHeader;

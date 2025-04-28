@@ -6,6 +6,7 @@ import useUserProfileStore from "../../store/userProfileStore";
 import useAuthStore from "../../store/authStore";
 import EditProfile from "./EditProfile";
 import useFollowUser from "../../hooks/useFollowUser";
+import { IoLocationOutline } from "react-icons/io5";
 
 const ProfileHeader = () => {
   const { userProfile } = useUserProfileStore();
@@ -56,9 +57,9 @@ const ProfileHeader = () => {
   };
 
   return (
-    <Flex gap={{ base: 4, sm: 10 }} py={10} direction={{ base: "column", sm: "row" }}>
+    <Flex gap={{ base: 2, sm: 10 }} py={{ base: 1, sm: 10 }} >
       <VStack>
-        <AvatarGroup size={{ base: "xl", md: "2xl" }} justifySelf={"center"} alignSelf={"flex-start"} mx={"auto"}>
+        <AvatarGroup size={{ base: "lg", md: "2xl" }} justifySelf={"center"} alignSelf={"flex-start"} mx={"auto"}>
           <Avatar src={userProfile.profilePicURL} alt="Profile Pic" />
         </AvatarGroup>
 
@@ -75,11 +76,10 @@ const ProfileHeader = () => {
         )}
       </VStack>
 
-      <VStack alignItems={"start"} gap={2} mx={"auto"} flex={1}>
+      <VStack alignItems={"start"} gap={1} mx={"auto"} flex={1}>
         <Flex
           gap={4}
-          direction={{ base: "column", sm: "row" }}
-          justifyContent={{ base: "center", sm: "flex-start" }}
+          justifyContent={"flex-start"}
           alignItems={"center"}
           w={"full"}
         >
@@ -132,18 +132,21 @@ const ProfileHeader = () => {
           </Text>
         </Flex>
 
-        <Text fontSize={"sm"} fontWeight={"bold"}>
+        <Text fontSize={"xs"} fontWeight={"bold"}>
           {userProfile.fullName}
         </Text>
 
         <Text fontSize={"sm"}>{userProfile.bio}</Text>
 
-        <Text fontSize={"sm"}>
-          <Text as="span" fontWeight={"bold"}>📍</Text>
-          {userProfile.location || "Not specified"}
-        </Text>
+        <Flex fontSize={"sm"} alignItems={"center"} gap={1}>
+          {userProfile.location?
+          <IoLocationOutline /> : ""
+          }
+          {/* {userProfile.location || "Not specified"} */}
+          {userProfile.location}
+        </Flex>
 
-        <Flex gap={2} wrap="wrap">
+        <Flex gap={2} wrap="wrap" fontSize={"xs"}>
           {Array.isArray(userProfile?.profession) && userProfile.profession.filter((prof) => prof.trim() !== "").length > 0 ? (
             userProfile.profession
               .filter((prof) => prof.trim() !== "") 
