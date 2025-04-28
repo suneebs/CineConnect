@@ -6,7 +6,6 @@ const TalentLink = () => {
   return (
     <Tooltip
       hasArrow
-      label="Talent Directory"
       ml={1}
       openDelay={500}
       placement='right'

@@ -6,7 +6,6 @@ const JobLink = () => {
   return (
     <Tooltip
       hasArrow
-      label="Job Opportunities"
       placement="right"
       ml={1}
       openDelay={500}

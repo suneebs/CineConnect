@@ -27,7 +27,7 @@ const FeedPosts = () => {
 			{!isLoading && posts.length === 0 && (
 				<>
 					<Text fontSize={"xl"} color={"red.400"} textAlign={"center"}>
-						Follow To see posts!
+						Follow to see posts!
 					</Text>
 					{/* <Text color={"red.400"}>Stop coding and go make some!!</Text> */}
 				</>
