@@ -22,36 +22,36 @@ const PostFooter = ({ post, isProfilePage, creatorProfile }) => {
 	};
 
 	return (
-		<Box mb={10} marginTop={"auto"}>
-			<Flex alignItems={"center"} gap={4} w={"full"} pt={0} mb={2} mt={4}>
-				<Box onClick={handleLikePost} cursor={"pointer"} fontSize={18}>
+		<Box mb={4} marginTop={"auto"}>
+			<Flex alignItems={"center"} gap={4} w={"full"} >
+				<Box onClick={handleLikePost} cursor={"pointer"}>
 					{!isLiked ? <NotificationsLogo /> : <UnlikeLogo />}
 				</Box>
 
-				<Box cursor={"pointer"} fontSize={18} onClick={() => commentRef.current.focus()}>
+				<Box cursor={"pointer"} onClick={() => commentRef.current.focus()}>
 					<CommentLogo />
 				</Box>
 			</Flex>
-			<Text fontWeight={600} fontSize={"sm"}>
+			<Text fontWeight={600} fontSize={{base:"xs",sm:"sm"}}>
 				{likes} likes
 			</Text>
 
 			{isProfilePage && (
-				<Text fontSize='12' color={"gray"}>
+				<Text fontSize={{base:'10',sm:'12'}} color={"gray"}>
 					Posted {timeAgo(post.createdAt)}
 				</Text>
 			)}
 
 			{!isProfilePage && (
 				<>
-					<Text fontSize='sm' fontWeight={700}>
+					<Text fontSize={{base:'xs',sm:'sm'}} fontWeight={700}>
 						{creatorProfile?.username}{" "}
 						<Text as='span' fontWeight={400}>
 							{post.caption}
 						</Text>
 					</Text>
 					{post.comments.length > 0 && (
-						<Text fontSize='sm' color={"gray"} cursor={"pointer"} onClick={onOpen}>
+						<Text fontSize={{base:'xs',sm:'sm'}} color={"gray"} cursor={"pointer"} onClick={onOpen}>
 							View all {post.comments.length} comments
 						</Text>
 					)}
