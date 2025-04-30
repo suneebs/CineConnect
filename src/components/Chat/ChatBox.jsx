@@ -13,7 +13,7 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import useAuth from "../../hooks/useAuth";
 import { format, isToday, isYesterday } from "date-fns";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 
 const ChatBox = ({ selectedChat, participantName, participantProfile, setSelectedChat }) => {
     const { user } = useAuth();
@@ -179,6 +179,8 @@ const ChatBox = ({ selectedChat, participantName, participantProfile, setSelecte
     };
 
     const groupedMessages = groupMessagesByDate();
+    const navigate = useNavigate();
+
 
     return (
     <Flex 
@@ -196,7 +198,10 @@ const ChatBox = ({ selectedChat, participantName, participantProfile, setSelecte
             <HStack>
                 <IconButton 
                     icon={<ArrowBackIcon />} 
-                    onClick={() => setSelectedChat(null)} 
+                    onClick={() => {
+                        setSelectedChat(null)
+                        navigate("/messages");
+                    }} 
                     aria-label="Back" 
                     color="white" 
                     bg="transparent" 

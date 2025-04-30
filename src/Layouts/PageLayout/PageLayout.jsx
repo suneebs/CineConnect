@@ -12,6 +12,9 @@ const PageLayout = ({ children }) => {
 	const [user, loading] = useAuthState(auth);
 	const isMobile = useBreakpointValue({ base: true, md: false });
 
+	// ✅ Check if current route is the chat page
+	const isChatPage = pathname.startsWith("/chat");
+
 	const canRenderSidebar = pathname !== "/auth" && user && !isMobile;
 	const canRenderNavbar = !user && !loading && pathname !== "/auth";
 
@@ -23,8 +26,8 @@ const PageLayout = ({ children }) => {
 			{/* Unauthenticated Navbar */}
 			{canRenderNavbar && <Navbar />}
 
-			{/* Authenticated Mobile Header */}
-			{user && isMobile && <MobileHeader />}
+			{/* Authenticated Mobile Header (excluded in Chat page) */}
+			{user && isMobile && !isChatPage && <MobileHeader />}
 
 			<Flex flex="1" flexDir={canRenderSidebar ? "row" : "column"}>
 				{/* Desktop Sidebar */}
@@ -35,18 +38,18 @@ const PageLayout = ({ children }) => {
 				)}
 
 				{/* Page Content */}
-				<Box 
-					flex="1" 
-					w="full" 
-					mx="auto" 
-					pb={user && isMobile ? "50px" : "0"}
+				<Box
+					flex="1"
+					w="full"
+					mx="auto"
+					pb={user && isMobile && !isChatPage ? "60px" : "0"} // Only add bottom padding if footer is present
 				>
 					{children}
 				</Box>
 			</Flex>
 
-			{/* Authenticated Mobile Footer */}
-			{user && isMobile && <MobileFooter />}
+			{/* Authenticated Mobile Footer (excluded in Chat page) */}
+			{user && isMobile && !isChatPage && <MobileFooter />}
 		</Flex>
 	);
 };
