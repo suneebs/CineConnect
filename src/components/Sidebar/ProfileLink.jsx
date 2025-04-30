@@ -8,7 +8,6 @@ const ProfileLink = () => {
 	return (
 		<Tooltip
 			hasArrow
-			label={"Profile"}
 			placement='right'
 			ml={1}
 			openDelay={500}

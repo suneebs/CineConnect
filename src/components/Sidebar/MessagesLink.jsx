@@ -6,7 +6,6 @@ const MessagesLink = () => {
   return (
     <Tooltip
       hasArrow
-      label="Messages"
       placement='right'
       ml={1}
       openDelay={500}
