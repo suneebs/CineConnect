@@ -12,7 +12,7 @@ const MobileFooter = () => {
       align="center"
       justify="space-around"
       position="fixed"
-      bottom="0"
+      bottom="-1"
       zIndex="10"
       bg="rgba(0, 0, 0, 0)"  // No semi-transparent background color
       backdropFilter="blur(10px)"  // Only the background gets blurred

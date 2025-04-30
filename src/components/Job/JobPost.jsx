@@ -67,7 +67,7 @@ const JobPost = ({ job }) => {
       boxShadow="0px 4px 10px rgba(0, 0, 0, 0.5)"
       transition="all 0.3s ease-in-out"
       
-      p={4}
+      p={{base:2,md:4}}
     >
       {/* Job Poster Info */}
       <Flex align="center" mb={3}>

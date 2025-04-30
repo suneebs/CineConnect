@@ -57,7 +57,7 @@ const AppliedJobs = ({ searchTerm = "" }) => {
 
             <Box
               key={job.id}
-              p={4}
+              p={{base:2,sm:4}}
               borderRadius="lg"
               bg="rgba(255, 255, 255, 0.1)" // ✅ Glassmorphic effect
               backdropFilter="blur(10px)" // ✅ Blurred background
@@ -65,19 +65,19 @@ const AppliedJobs = ({ searchTerm = "" }) => {
             >
             
               {/* ✅ Job Title */}
-              <Text fontSize="xl" fontWeight="bold" color="white">
+              <Text fontSize={{base:"md",sm:"xl"}} fontWeight="bold" color="white">
                 {job.title}
               </Text>
 
               {/* ✅ Job Description */}
-              <Text fontSize="md" color="gray.300" mt={1}>
+              <Text fontSize={{base:"sm",sm:"md"}} color="gray.300" mt={{base:0,sm:1}}>
                 {job.description}
               </Text>
 
               <Divider my={2} borderColor="gray.600" />
 
               {/* ✅ Job Details */}
-              <HStack spacing={1} wrap="wrap" mb={2}>
+              <HStack spacing={1} wrap="wrap" mb={{base:1,sm:2}}>
                 <Badge bg="rgba(255, 255, 255, 0.1)"
                 color="white"
                 borderRadius="full"
@@ -137,7 +137,7 @@ const AppliedJobs = ({ searchTerm = "" }) => {
                 <Button
                   leftIcon={<Icon as={GrRevert} />}
                   colorScheme="red"
-                  size="sm"
+                  size={{base:"xs",sm:"sm"}}
                   variant="solid"
                   onClick={() => handleRevertApplication(job.id)}
                 >

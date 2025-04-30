@@ -32,16 +32,16 @@ const JobPage = () => {
   }, [jobs, searchTerm]);
 
   return (
-    <Box px={6} py={4} w="full" mt={4}>
+    <Box px={{base:1,sm:6}} py={{sm:4}} w="full" mt={{sm:4}}>
       <Input
-        placeholder="Search by title, company, location, or role..."
+        placeholder="Search"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        size="lg"
+        size={{base:"md",sm:"lg"}}
         borderRadius="md"
         bg="rgba(255, 255, 255, 0.05)"
         _focus={{ bg: "rgba(255, 255, 255, 0.1)" }}
-        mb={4}
+        mb={{base:2,sm:4}}
       />
 
       <Tabs variant="soft-rounded" colorScheme="blue">
@@ -54,7 +54,7 @@ const JobPage = () => {
 
         <TabPanels>
           <TabPanel>
-            <Divider my={4} />
+            {/* <Divider my={{base:2,sm:4}} /> */}
             <JobPosts jobs={filteredJobs} loading={loading} searchTerm={searchTerm} />
           </TabPanel>
           <TabPanel>
