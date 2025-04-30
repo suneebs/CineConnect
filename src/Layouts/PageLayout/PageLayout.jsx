@@ -39,6 +39,7 @@ const PageLayout = ({ children }) => {
 					flex="1" 
 					w="full" 
 					mx="auto" 
+					pb={user && isMobile ? "50px" : "0"}
 				>
 					{children}
 				</Box>
