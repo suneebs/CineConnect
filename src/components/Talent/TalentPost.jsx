@@ -5,6 +5,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import useFollowUser from "../../hooks/useFollowUser";
 import useAuthStore from "../../store/authStore";
 import { Link } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
 
 const TalentPost = ({ talent, setTalents }) => {
   const { isFollowing, isUpdating, handleFollowUser } = useFollowUser(talent.uid);
@@ -42,16 +43,29 @@ const TalentPost = ({ talent, setTalents }) => {
     >
       {/* Profile Image */}
       <Link to={`/${talent.username}`}>
-        <Image 
-          src={talent.profilePicURL} 
-          alt={talent.username} 
-          objectFit="cover" 
-          w="100%" 
-          h={{base:"100px",sm:"240px"}}
-          borderTopRadius="lg"
-          transition="0.3s"
-          _hover={{ filter: "brightness(1.2)" }}
-        />
+      {talent.profilePicURL ? (
+  <Image
+    src={talent.profilePicURL}
+    alt={talent.username}
+    objectFit="cover"
+    w="100%"
+    h={{ base: "100px", sm: "240px" }}
+    borderTopRadius="lg"
+    transition="0.3s"
+    _hover={{ filter: "brightness(1.2)" }}
+  />
+) : (
+  <Flex
+    align="center"
+    justify="center"
+    w="100%"
+    h={{ base: "100px", sm: "240px" }}
+    bg="gray.700"
+    borderTopRadius="lg"
+  >
+    <Icon as={FaUserCircle} boxSize={{ base: "80px", sm: "160px" }} color="whiteAlpha.700" />
+  </Flex>
+)}
       </Link>
 
       {/* Talent Info Section */}
