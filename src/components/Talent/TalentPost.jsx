@@ -5,6 +5,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import useFollowUser from "../../hooks/useFollowUser";
 import useAuthStore from "../../store/authStore";
 import { Link } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
 
 const TalentPost = ({ talent, setTalents }) => {
   const { isFollowing, isUpdating, handleFollowUser } = useFollowUser(talent.uid);
@@ -30,7 +31,6 @@ const TalentPost = ({ talent, setTalents }) => {
     <Box
       borderRadius="lg"
       overflow="hidden"
-      w="full"
       bg="rgba(255, 255, 255, 0.05)"  // Glassmorphism Effect
       border="1px solid rgba(255, 255, 255, 0.2)"
       boxShadow="0px 4px 10px rgba(0, 0, 0, 0.5)"
@@ -43,35 +43,45 @@ const TalentPost = ({ talent, setTalents }) => {
     >
       {/* Profile Image */}
       <Link to={`/${talent.username}`}>
-        <Image 
-          src={talent.profilePicURL} 
-          alt={talent.username} 
-          objectFit="cover" 
-          w="100%" 
-          h="240px" 
-          borderTopRadius="lg"
-          transition="0.3s"
-          _hover={{ filter: "brightness(1.2)" }}
-        />
+      {talent.profilePicURL ? (
+  <Image
+    src={talent.profilePicURL}
+    alt={talent.username}
+    objectFit="cover"
+    w="100%"
+    h={{ base: "100px", sm: "240px" }}
+    borderTopRadius="lg"
+    transition="0.3s"
+    _hover={{ filter: "brightness(1.2)" }}
+  />
+) : (
+  <Flex
+    align="center"
+    justify="center"
+    w="100%"
+    h={{ base: "100px", sm: "240px" }}
+    bg="gray.700"
+    borderTopRadius="lg"
+  >
+    <Icon as={FaUserCircle} boxSize={{ base: "80px", sm: "160px" }} color="whiteAlpha.700" />
+  </Flex>
+)}
       </Link>
 
       {/* Talent Info Section */}
-      <VStack spacing={3} p={3} align="start" w="100%">
+      <VStack spacing={1} p={2} align="start" w="100%">
         {/* Header: Name & Follow Button */}
         <Flex justify="space-between" align="center" w="100%">
           <Link to={`/${talent.username}`}>
-            <Text fontWeight="bold" fontSize="lg" color="white">
+            <Text  fontSize={{base:"sm",sm:"lg"}} color="white">
               {talent.username}
             </Text>
           </Link>
           {authUser?.uid !== talent.uid && (
             <Button
-              size="sm"
+              size={{base:"xs",sm:"sm"}}
               colorScheme={isFollowing ? "gray" : "blue"}
-              borderRadius="full"
-              px={5}
-              fontSize="sm"
-              fontWeight="medium"
+              fontSize={{base:"xs",sm:"sm"}}
               isLoading={isUpdating}
               _hover={{
                 transform: "scale(1.05)",
@@ -87,7 +97,7 @@ const TalentPost = ({ talent, setTalents }) => {
         {/* Location Section */}
         <HStack>
           <Icon as={FaMapMarkerAlt} color="cyan.300" />
-          <Text fontSize="sm" color="gray.300">
+          <Text fontSize={{base:"xs",sm:"sm"}} color="gray.300">
             {talent.location?.length > 0 ? talent.location : "Location not specified"}
           </Text>
         </HStack>
@@ -101,14 +111,12 @@ const TalentPost = ({ talent, setTalents }) => {
                 bg="rgba(255, 255, 255, 0.1)"
                 color="white"
                 borderRadius="full"
-                px={3}
-                py={1}
+                // px={3}
+                // py={1}
                 fontSize="xs"
                 border="1px solid rgba(255, 255, 255, 0.2)"
                 boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)"
-                _hover={{
-                  boxShadow: "0px 0px 12px rgba(255, 255, 255, 0.3)",
-                }}
+                
               >
                 {prof}
               </Badge>

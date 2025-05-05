@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { 
-  Box, Container, Text, Avatar, VStack, HStack, Spacer 
+  Box, Container, Text, Avatar, VStack, HStack, Spacer, 
+  Flex
 } from "@chakra-ui/react";
 import { 
   collection, query, where, orderBy, onSnapshot, deleteDoc, doc, updateDoc 
@@ -92,13 +93,12 @@ const NotificationsPage = () => {
   const categorizedNotifications = categorizeNotifications(notifications);
 
   return (
-    <Container maxW="container.sm" py={5} >
-      <Box align="center" mb={5}>
+    <Container maxW="container.sm" >
+      <Flex align="center" justify={"space-between"} borderBottom={"1px solid rgba(255, 255, 255, 0.2)"} mb={1}>
         <Text fontSize="2xl" fontWeight="bold" textAlign="center">
           Notifications
         </Text>
-      </Box>
-
+        <Flex>
       {notifications.length > 0 && (
         <Text
           align="right"
@@ -110,6 +110,9 @@ const NotificationsPage = () => {
           Clear All
         </Text>
       )}
+      </Flex>
+      </Flex>
+
 
       {notifications.length === 0 ? (
         <Text color="gray.400" textAlign="center">No new notifications yet.</Text>

@@ -85,7 +85,7 @@ const MyJobPosts = ({ searchTerm = "" }) => {
   return (
     <Box>
       {/* ✅ New Job Button */}
-      <Flex justify="end" mb={5}>
+      <Flex justify="end" mb={{base:2,sm:5}}>
         <Button colorScheme={isFormOpen ? "red" : "blue"} onClick={toggleForm}>
           {isFormOpen ? "Cancel" : "New Job"}
         </Button>
@@ -121,7 +121,7 @@ const MyJobPosts = ({ searchTerm = "" }) => {
   .map((job) => (
               <Box
                 key={job.id}
-                p={4}
+                p={{base:1,sm:4}}
                 borderRadius="lg"
                 bg="rgba(255, 255, 255, 0.1)" // ✅ Glassmorphic effect
                 boxShadow="lg"
@@ -130,17 +130,17 @@ const MyJobPosts = ({ searchTerm = "" }) => {
               >
                 {/* ✅ Posted Date */}
                 {job.createdAt && (
-                  <Text fontSize="sm" color="gray.400" position="absolute" top={3} right={4}>
+                  <Text fontSize={{base:"xs",sm:"sm"}} color="gray.400" position="absolute" top={{base:2,sm:3}} right={{base:1,sm:4}}>
                     Posted on {format(new Date(job.createdAt.seconds * 1000), "dd MMM yyyy")}
                   </Text>
                 )}
 
                 {/* ✅ Job Title */}
-                <Text fontSize="xl" fontWeight="bold" color="white">
+                <Text fontSize={{base:"md",sm:"xl"}} fontWeight="bold" color="white">
                   {job.title}
                 </Text>
 
-                <Text fontSize="md" color="gray.300" mt={1}>
+                <Text fontSize={{base:"sm",sm:"md"}} color="gray.300" mt={{base:0,sm:1}}>
                   {job.description}
                 </Text>
 
@@ -148,58 +148,81 @@ const MyJobPosts = ({ searchTerm = "" }) => {
 
                 {/* ✅ Job Details */}
                 <HStack spacing={2} wrap="wrap" mb={3}>
-                  <Badge bg="rgba(255, 255, 255, 0.1)"
-                color="white"
-                borderRadius="full"
-                px={3}
-                py={1}
-                fontSize="xs"
-                border="1px solid rgba(255, 255, 255, 0.2)"
-                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
-                    {job.category}
-                  </Badge>
-                  <Badge bg="rgba(255, 255, 255, 0.1)"
-                color="white"
-                borderRadius="full"
-                px={3}
-                py={1}
-                fontSize="xs"
-                border="1px solid rgba(255, 255, 255, 0.2)"
-                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
-                    {job.gender || "Not mentioned"}
-                  </Badge>
-                  <Badge bg="rgba(255, 255, 255, 0.1)"
-                color="white"
-                borderRadius="full"
-                px={3}
-                py={1}
-                fontSize="xs"
-                border="1px solid rgba(255, 255, 255, 0.2)"
-                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
-                    {job.age || "Not mentioned"}
-                  </Badge>
-                  <Badge bg="rgba(255, 255, 255, 0.1)"
-                color="white"
-                borderRadius="full"
-                px={3}
-                py={1}
-                fontSize="xs"
-                border="1px solid rgba(255, 255, 255, 0.2)"
-                boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
-                    {job.location}
-                  </Badge>
-                  {job.experience && (
-                    <Badge bg="rgba(255, 255, 255, 0.1)"
-                    color="white"
-                    borderRadius="full"
-                    px={3}
-                    py={1}
-                    fontSize="xs"
-                    border="1px solid rgba(255, 255, 255, 0.2)"
-                    boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)">
-                      {job.experience}
-                    </Badge>
-                  )}
+                {job.category && (
+  <Badge
+    bg="rgba(255, 255, 255, 0.1)"
+    color="white"
+    borderRadius="full"
+    px={3}
+    py={1}
+    fontSize="xs"
+    border="1px solid rgba(255, 255, 255, 0.2)"
+    boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)"
+  >
+    {job.category}
+  </Badge>
+)}
+
+{job.gender && (
+  <Badge
+    bg="rgba(255, 255, 255, 0.1)"
+    color="white"
+    borderRadius="full"
+    px={3}
+    py={1}
+    fontSize="xs"
+    border="1px solid rgba(255, 255, 255, 0.2)"
+    boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)"
+  >
+    {job.gender}
+  </Badge>
+)}
+
+{job.age && (
+  <Badge
+    bg="rgba(255, 255, 255, 0.1)"
+    color="white"
+    borderRadius="full"
+    px={3}
+    py={1}
+    fontSize="xs"
+    border="1px solid rgba(255, 255, 255, 0.2)"
+    boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)"
+  >
+    {"Age: "}{job.age}
+  </Badge>
+)}
+
+{job.location && (
+  <Badge
+    bg="rgba(255, 255, 255, 0.1)"
+    color="white"
+    borderRadius="full"
+    px={3}
+    py={1}
+    fontSize="xs"
+    border="1px solid rgba(255, 255, 255, 0.2)"
+    boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)"
+  >
+    {job.location}
+  </Badge>
+)}
+
+{job.experience && (
+  <Badge
+    bg="rgba(255, 255, 255, 0.1)"
+    color="white"
+    borderRadius="full"
+    px={3}
+    py={1}
+    fontSize="xs"
+    border="1px solid rgba(255, 255, 255, 0.2)"
+    boxShadow="0px 0px 8px rgba(255, 255, 255, 0.1)"
+  >
+    {job.experience}
+  </Badge>
+)}
+
                 </HStack>
 
                 {/* ✅ Action Buttons */}
@@ -208,7 +231,7 @@ const MyJobPosts = ({ searchTerm = "" }) => {
                     <Button
                       colorScheme="blue"
                       variant="outline"
-                      size="sm"
+                      size={{base:"xs",sm:"sm"}}
                       leftIcon={<Icon as={FaEdit} />}
                       onClick={() => {
                         setEditingJob(job);
@@ -221,7 +244,7 @@ const MyJobPosts = ({ searchTerm = "" }) => {
                     <Button
                       colorScheme="red"
                       variant="outline"
-                      size="sm"
+                      size={{base:"xs",sm:"sm"}}
                       leftIcon={<Icon as={FaTrash} />}
                       onClick={() => handleDeleteJob(job.id)}
                     >
@@ -232,7 +255,7 @@ const MyJobPosts = ({ searchTerm = "" }) => {
                   <Button
                     colorScheme="green"
                     variant="solid"
-                    size="sm"
+                    size={{base:"xs",sm:"sm"}}
                     leftIcon={<Icon as={FaUsers} />}
                     onClick={() => {
                       setSelectedJob(job);

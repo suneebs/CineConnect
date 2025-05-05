@@ -50,7 +50,7 @@ const CreatePost = () => {
 
 	return (
 		<>
-			<Tooltip hasArrow label={"Create"} placement="right" ml={1} openDelay={500} display={{ base: "block", md: "none" }}>
+			<Tooltip hasArrow placement="right" ml={1} openDelay={500} display={{ base: "block", md: "none" }}>
 				<Flex alignItems={"center"} gap={4} _hover={{ bg: "whiteAlpha.400" }} borderRadius={6} p={2} w={{ base: 10, md: "full" }}
 					justifyContent={{ base: "center", md: "flex-start" }} onClick={onOpen}>
 					<CreatePostLogo />
@@ -58,37 +58,107 @@ const CreatePost = () => {
 				</Flex>
 			</Tooltip>
 
-			<Modal isOpen={isOpen} onClose={onClose} size="xl">
-				<ModalOverlay />
-				<ModalContent bg={"black"} border={"1px solid gray"}>
-					<ModalHeader>Create Post</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody pb={6}>
-						<Textarea placeholder="Post caption..." value={caption} onChange={(e) => setCaption(e.target.value)} />
-						<Input type="file" hidden ref={fileRef} onChange={handleMediaChange} accept="image/*,video/*" />
-						<Flex mt={3} gap={4}>
-							<MdPermMedia onClick={() => fileRef.current.click()} style={{ cursor: "pointer" }} size={24} />
-						</Flex>
+			<Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
+	<ModalOverlay />
+	<ModalContent
+		bgGradient="linear(to-br, #0A0F1F, #162447, #1F4068, #1B1B2F)"
+		color="whiteAlpha.900"
+		borderRadius="2xl"
+		shadow="xl"
+		border="1px solid rgba(255, 255, 255, 0.08)"
+	>
+		<ModalHeader fontSize="2xl" fontWeight="bold">
+			Create Post
+		</ModalHeader>
+		<ModalCloseButton color="whiteAlpha.700" />
+		<ModalBody pb={6}>
+			<Textarea
+				placeholder="Write your thoughts..."
+				_focus={{ borderColor: "whiteAlpha.500", boxShadow: "0 0 0 1px whiteAlpha.500" }}
+				value={caption}
+				onChange={(e) => setCaption(e.target.value)}
+				color="white"
+				bg="whiteAlpha.100"
+				border="1px solid"
+				borderColor="whiteAlpha.200"
+				_hover={{ borderColor: "whiteAlpha.400" }}
+			/>
 
-						{selectedFile && (
-							<Flex mt={5} w={"full"} position={"relative"} justifyContent={"center"}>
-								{fileType === "image" ? (
-									<Image src={selectedFile} alt="Selected media" />
-								) : (
-									<video src={selectedFile} controls style={{ maxWidth: "100%" }} />
-								)}
-								<CloseButton position={"absolute"} top={2} right={2} onClick={() => setSelectedFile(null)} />
-							</Flex>
-						)}
-					</ModalBody>
+			<Input
+				type="file"
+				hidden
+				ref={fileRef}
+				onChange={handleMediaChange}
+				accept="image/*,video/*"
+			/>
 
-					<ModalFooter>
-						<Button mr={3} onClick={handlePostCreation} isLoading={isLoading}>
-							Post
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+			<Flex mt={4} gap={4} alignItems="center">
+				<Button
+					leftIcon={<MdPermMedia />}
+					onClick={() => fileRef.current.click()}
+					variant="outline"
+					colorScheme="blue"
+					border="1px solid"
+					borderColor="whiteAlpha.300"
+					_hover={{ bg: "whiteAlpha.200" }}
+				>
+					Add Media
+				</Button>
+			</Flex>
+
+			{selectedFile && (
+				<Flex mt={5} w={"full"} position={"relative"} justifyContent={"center"}>
+					{fileType === "image" ? (
+						<Image
+							src={selectedFile}
+							alt="Selected media"
+							borderRadius="lg"
+							maxH="300px"
+							objectFit="cover"
+							boxShadow="lg"
+						/>
+					) : (
+						<video
+							src={selectedFile}
+							controls
+							style={{ maxWidth: "100%", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.4)" }}
+						/>
+					)}
+					<CloseButton
+						position="absolute"
+						top={2}
+						right={2}
+						color="whiteAlpha.800"
+						bg="blackAlpha.600"
+						borderRadius="full"
+						_hover={{ bg: "blackAlpha.800" }}
+						onClick={() => setSelectedFile(null)}
+					/>
+				</Flex>
+			)}
+		</ModalBody>
+
+		<ModalFooter>
+			<Button
+				colorScheme="blue"
+				mr={3}
+				isLoading={isLoading}
+				onClick={handlePostCreation}
+				bg="blue.500"
+				_hover={{ bg: "blue.600" }}
+				color="white"
+				borderRadius="md"
+				px={6}
+			>
+				Post
+			</Button>
+			<Button variant="ghost" onClick={onClose} color="whiteAlpha.700">
+				Cancel
+			</Button>
+		</ModalFooter>
+	</ModalContent>
+</Modal>
+
 		</>
 	);
 };

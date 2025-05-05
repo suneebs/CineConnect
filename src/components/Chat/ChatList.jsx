@@ -33,7 +33,7 @@ const ChatList = ({ chats, setSelectedChat, selectedChat }) => {
     return (
         <VStack spacing={0} w="full" align="stretch">
             {/* ✅ Search Bar */}
-            <Box p={3} mt={5}>
+            <Box p={{base:1,sm:3}} mt={{base:-3,sm:5}}>
                 <InputGroup>
                     <InputLeftElement pointerEvents="none">
                         <Icon as={SearchIcon} color="gray.400" />
