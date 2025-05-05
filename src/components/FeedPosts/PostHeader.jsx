@@ -7,17 +7,17 @@ const PostHeader = ({ post, creatorProfile }) => {
 	const { handleFollowUser, isFollowing, isUpdating } = useFollowUser(post.createdBy);
 
 	return (
-		<Flex justifyContent={"space-between"} alignItems={"center"} w={"full"} my={2}>
+		<Flex justifyContent={"space-between"} alignItems={"center"} w={"full"} my={1}>
 			<Flex alignItems={"center"} gap={2}>
 				{creatorProfile ? (
 					<Link to={`/${creatorProfile.username}`}>
-						<Avatar src={creatorProfile.profilePicURL} alt='user profile pic' size={"sm"} />
+						<Avatar src={creatorProfile.profilePicURL} alt='user profile pic' size={{base:"xs",sm:"sm"}} />
 					</Link>
 				) : (
 					<SkeletonCircle size='10' />
 				)}
 
-				<Flex fontSize={12} fontWeight={"bold"} gap='2'>
+				<Flex fontSize={{base:10,sm:12}} fontWeight={"bold"} gap='2'>
 					{creatorProfile ? (
 						<Link to={`/${creatorProfile.username}`}>{creatorProfile.username}</Link>
 					) : (
@@ -31,7 +31,7 @@ const PostHeader = ({ post, creatorProfile }) => {
 				<Button
 					size={"xs"}
 					bg={"transparent"}
-					fontSize={12}
+					fontSize={{base:10,sm:12}}
 					color={"blue.500"}
 					fontWeight={"bold"}
 					_hover={{

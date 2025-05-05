@@ -21,7 +21,7 @@ const HomePage = () => {
     return (
         <Container maxW={"container.lg"}>
             <Flex gap={20}>
-                <Box flex={2} py={10}>
+                <Box flex={2} py={{base:0,sm:8}}>
                     {showNotifications ? <NotificationsPage /> : <FeedPosts />}
                 </Box>
                 <Box flex={3} mr={20} display={{ base: "none", lg: "block" }} maxW={"300px"}>

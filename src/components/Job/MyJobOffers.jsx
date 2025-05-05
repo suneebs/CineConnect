@@ -7,10 +7,10 @@ const MyJobOffers = ({ searchTerm }) => {
     <Box w="full" maxW="900px" mx="auto">
       <Tabs variant="unstyled">
         <TabList display="flex" justifyContent="space-around" borderBottom="1px solid gray">
-          <Tab _selected={{ color: "blue.400", borderBottom: "2px solid blue.400" }} fontSize="lg" fontWeight="bold" py={3}>
+          <Tab _selected={{ color: "blue.400", borderBottom: "2px solid blue.400" }} fontSize={{base:"md",sm:"lg"}} fontWeight="bold" py={3}>
             My Job Posts
           </Tab>
-          <Tab _selected={{ color: "blue.400", borderBottom: "2px solid blue.400" }} fontSize="lg" fontWeight="bold" py={3}>
+          <Tab _selected={{ color: "blue.400", borderBottom: "2px solid blue.400" }} fontSize={{base:"md",sm:"lg"}} fontWeight="bold" py={3}>
             Applied Jobs
           </Tab>
         </TabList>
