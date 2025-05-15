@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom"; // Track page changes
 import FeedPosts from "../../components/FeedPosts/FeedPosts";
 import SuggestedUsers from "../../components/SuggestedUsers/SuggestedUsers";
 import NotificationsPage from "../NotificationsPage/NotificationsPage";
-import { useSidebarStore } from "../../Context/sidebarContext.jsx";
+import { useSidebarStore } from "../../Context/sidebarContext";
 
 const HomePage = () => {
     const showNotifications = useSidebarStore((state) => state.showNotifications);
