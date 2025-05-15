@@ -158,7 +158,7 @@ const CreatePost = () => {
 		</ModalFooter>
 	</ModalContent>
 </Modal>
-
+ 
 		</>
 	);
 };

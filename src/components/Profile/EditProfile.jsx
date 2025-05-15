@@ -55,7 +55,13 @@ const EditProfile = ({ isOpen, onClose }) => {
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} isCentered size="md">
 			<ModalOverlay />
-			<ModalContent>
+			<ModalContent
+			bgGradient="linear(to-br, #0A0F1F, #162447, #1F4068, #1B1B2F)"
+					color="whiteAlpha.900"
+					borderRadius="2xl"
+					boxShadow="dark-lg"
+					border="1px solid #2a2a40"
+					>
 				<ModalHeader>Edit Profile</ModalHeader>
 				<ModalCloseButton />
 
