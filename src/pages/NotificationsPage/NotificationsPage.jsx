@@ -126,35 +126,38 @@ const NotificationsPage = () => {
                 </Text>
                 <VStack spacing={1} align="stretch">
                   {notifs.map((notif) => (
-                    <Box
-                      key={notif.id}
-                      p={2}
-                      borderRadius="lg"
-                      bg="rgba(255, 255, 255, 0.05)"
-                      _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
-                      transition="0.2s ease-in-out"
-                    >
-                      <HStack spacing={2}>
-                        <Avatar size="sm" src={notif.senderProfilePic || ""} />
-                        <Box flex="full">
-                          <Text fontSize="sm" fontWeight="bold">
-                            {notif.senderName}{" "}
-                            <Text as="span" fontWeight="normal">
-                              {notif.type === "comment"
-                                ? `commented on a post: "${notif.commentText}"`
-                                : notif.type === "like"
-                                ? "liked your post."
-                                : "started following you."}
-                            </Text>
-                          </Text>
-                        </Box>
-                        <Spacer />
-                        <Text fontSize="xs" color="gray.400">
-                          {formatTime(notif.timestamp)}
-                        </Text>
-                      </HStack>
-                    </Box>
-                  ))}
+  <Box
+    key={notif.id}
+    p={2}
+    borderRadius="lg"
+    bg="rgba(255, 255, 255, 0.05)"
+    _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
+    transition="0.2s ease-in-out"
+  >
+    <HStack spacing={2}>
+      <Avatar size="sm" src={notif.senderProfilePic || ""} />
+      <Box flex="full">
+        <Text fontSize="sm" fontWeight="bold">
+          {notif.senderName}{" "}
+          <Text as="span" fontWeight="normal">
+            {notif.type === "comment"
+              ? `commented on a post: "${notif.commentText}"`
+              : notif.type === "like"
+              ? "liked your post."
+              : "started following you."}
+          </Text>
+        </Text>
+      </Box>
+      <Spacer />
+      {category === "Today" && (
+        <Text fontSize="xs" color="gray.400">
+          {formatTime(notif.timestamp)}
+        </Text>
+      )}
+    </HStack>
+  </Box>
+))}
+
                 </VStack>
               </Box>
             )
