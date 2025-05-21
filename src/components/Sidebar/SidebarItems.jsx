@@ -11,10 +11,10 @@ const SidebarItems = () => {
   return (
     <>
       <Home />
-      <Search />
+      {/* <Search /> */}
+      <TalentLink />
       <Notifications />
       <CreatePost />
-      <TalentLink />
       <JobLink />
       <MessagesLink />
       <ProfileLink />

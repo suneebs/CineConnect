@@ -36,7 +36,7 @@ const MobileHeader = () => {
 
       {/* Right Side */}
       <Flex align="center" gap={4}>
-        <Search />
+        {/* <Search /> */}
         <Notifications />
       </Flex>
     </Flex>

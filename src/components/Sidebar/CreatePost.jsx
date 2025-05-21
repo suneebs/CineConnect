@@ -58,14 +58,15 @@ const CreatePost = () => {
 				</Flex>
 			</Tooltip>
 
-			<Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
-	<ModalOverlay />
+			<Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered motionPreset='slideInLeft'>
+	<ModalOverlay bg='blackAlpha.700' backdropFilter='blur(10px)' />
 	<ModalContent
 		bgGradient="linear(to-br, #0A0F1F, #162447, #1F4068, #1B1B2F)"
 		color="whiteAlpha.900"
 		borderRadius="2xl"
 		shadow="xl"
 		border="1px solid rgba(255, 255, 255, 0.08)"
+		maxW={{base:"370px", sm: "500px", md: "600px"}}
 	>
 		<ModalHeader fontSize="2xl" fontWeight="bold">
 			Create Post
