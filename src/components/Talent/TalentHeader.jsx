@@ -6,7 +6,7 @@ const TalentHeader = ({ searchQuery, setSearchQuery }) => {
       <h1 style={{ fontSize: "1.8rem", fontWeight: "bold" }}>Cinema Talent Directory</h1>
       <p>Discover talented professionals in the cinema industry</p>
 
-      <Flex w="full" mb={4} mt={{base:2, sm:10}}>
+      <Flex w="full" mb={4} mt={{base:2, sm:4}}>
         <Input
           placeholder="Search"
           value={searchQuery}

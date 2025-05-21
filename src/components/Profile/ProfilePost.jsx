@@ -125,9 +125,15 @@ const ProfilePost = ({ post }) => {
 
 			<Modal isOpen={isOpen} onClose={onClose} isCentered={true} size={{ base: "3xl", md: "5xl" }}>
 				<ModalOverlay />
-				<ModalContent>
+				<ModalContent 
+				bgGradient="linear(to-br, #0A0F1F, #162447, #1F4068, #1B1B2F)"
+		color="whiteAlpha.900"
+		borderRadius="2xl"
+		shadow="xl"
+		border="1px solid rgba(255, 255, 255, 0.08)"
+				>
 					<ModalCloseButton />
-					<ModalBody bg={"black"} pb={5}>
+					<ModalBody pb={5}>
 						<Flex
 							gap='4'
 							w={{ base: "90%", sm: "70%", md: "full" }}
@@ -186,8 +192,6 @@ const ProfilePost = ({ post }) => {
 										<Comment key={comment.id} comment={comment} />
 									))}
 								</VStack>
-								<Divider my={4} bg={"gray.8000"} />
-
 								<PostFooter isProfilePage={true} post={post} />
 							</Flex>
 						</Flex>

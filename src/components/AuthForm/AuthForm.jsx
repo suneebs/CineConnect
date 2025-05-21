@@ -12,7 +12,6 @@ const AuthForm = () => {
 		<>
 			<Box borderRadius={4} padding={5} minW={"96"}>
 				<VStack spacing={4}>
-					{/* <Image src='/logo1.png' h={24} cursor={"pointer"} alt='cineconnect' /> */}
 					<CineConnectLogo />
 
 					{isLogin ? <Login /> : <Signup />}
